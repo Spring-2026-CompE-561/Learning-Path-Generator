@@ -181,5 +181,24 @@ components:
     Roadmap:
       type: object
       description: visualization of topics to master 
-
+      required:
+        - id
+        - User_ID
+        - Current_step
+        - Completed_steps
+      properties:
+        id: 
+          type: integer
+          description: id corresponding to generated roadmap
+          readOnly: true
+        user_ID:
+          type: integer
+          description: foreign key that refers to the user_ID
+        complete_steps:
+          type: integer
+          description: how many steps have the user completed
+          readOnly: true
+        current_step:
+          type: integer
+          description: where the user is currently on the roadmap
       
