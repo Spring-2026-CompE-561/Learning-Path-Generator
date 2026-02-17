@@ -1,0 +1,185 @@
+openapi: 3.0.3
+info: 
+  title: LearnPath API
+  version: '1.0.0'
+  description: |
+    The LearnPath API helps you learn a given topic faster and more organized.
+
+    ### Current Features:
+      * Generate a roadmap on different milestones to master for learning the given topic
+      * Personalized roadmap based on User's level
+      * ... IDK
+
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+  - url: https://api.learnpath.com
+    description: Production server
+
+paths:
+  /api/users:
+      get:
+        summary: Retrieve a list of users
+        responses:           
+          '200':               
+            description: List retrieved
+            content:      
+              application/json:     #JSON response
+                schema:      #Structure of the response
+                  type: array
+                  items:          # Each item in the array is
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      email:
+                        type: string
+          '401':
+            description: Invalid credentials
+          '404':
+            description: Not found
+          '500':
+            description: Server error
+      post:  
+        summary: Create a new user
+        requestBody:  #Request Parameters that user need to send to API
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  email:
+                    type: string
+                  password:
+                    type: string
+        responses:
+          '201':
+            description: User created successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    success: 
+                      type: boolean
+                    user: 
+                      type: object
+                    properties:
+                      id:
+                        type: integer
+                      name: 
+                        type: string
+                      email: 
+                        type: string
+          '400':
+            description: Bad request
+  /api/users/{id}:
+    put:  
+      summary: Update user information
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '404':
+          description: User not found
+    delete:  
+      summary: Delete a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '404':
+          description: User not found
+
+#Data models(components)
+components:
+  schemas:
+    User:
+      type: object
+      description: Represents an user account
+      required:
+        - id
+        - name
+        - email
+        - password
+        - experience_level
+        - created_at
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for each user
+          readOnly: true  # User can't input this
+        name:
+          type: string 
+          description: user's first name and last name initial
+        email:
+          type: string
+          format: email #will be implement
+          description: user's email, must be unique & right format
+        password:
+          type: string
+          description: user's password (hashed)
+          minLength: 8
+          maxLength: 20
+          writeOnly: true # Don't return this in successful confirmation message
+        experience_level:
+          type: string
+          description: user's proficiency
+          enum:
+            - beginner
+            - intermediate
+            - advanced
+        created_at:
+          type: string
+          format: date-time
+          description: time the user is created
+          readOnly: true #system-generated at time of creation
+    Roadmap:
+      type: object
+      description: visualization of topics to master 
+
+      
