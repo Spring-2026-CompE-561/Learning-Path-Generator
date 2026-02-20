@@ -374,15 +374,15 @@ paths:
           
 #Data models(components)
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
-    securitySchemes:
-      bearerAuth:
-        type: http             # It's HTTP-based authentication
-        scheme: bearer         # Uses "bearer" token
-        bearerFormat: JWT      # JWT Tokens in this case
     User:
       type: object
-      description: Represents an user account
+      description: Represents a user account
       required:
         - id
         - name
@@ -394,23 +394,23 @@ components:
         id:
           type: integer
           description: Unique identifier for each user
-          readOnly: true  # User can't input this
+          readOnly: true
         name:
-          type: string 
-          description: user's first name and last name initial
+          type: string
+          description: User's first name and last name initial
         email:
           type: string
-          format: email #will be implement
-          description: user's email, must be unique & right format
+          format: email
+          description: User's email, must be unique and correct format
         password:
           type: string
-          description: user's password (hashed)
+          description: User's password (hashed)
           minLength: 8
           maxLength: 20
-          writeOnly: true # Don't return this in successful confirmation message
+          writeOnly: true
         experience_level:
           type: string
-          description: user's proficiency
+          description: User's proficiency
           enum:
             - beginner
             - intermediate
@@ -418,53 +418,119 @@ components:
         created_at:
           type: string
           format: date-time
-          description: time the user is created
-          readOnly: true 
-    Topic:
+          description: Time the user was created
+          readOnly: true
+    LearningPath:
       type: object
+      description: Visualization of topics to master
+      required:
+        - id
+        - user_id
+        - topic_name
+        - weeks
+      properties:
+        id:
+          type: integer
+          description: ID corresponding to generated learning path
+          readOnly: true
+        user_id:
+          type: integer
+          description: Foreign key that refers to the user_id
+        topic_name:
+          type: string
+          description: Topic the user wants to learn e.g. Python, Data Structures
+          maxLength: 30
+        topic_category:
+          type: string
+          description: Category of the topic e.g. programming, data structures
+        difficulty:
+          type: string
+          description: User's proficiency level for this topic
+          enum:
+            - beginner
+            - intermediate
+            - advanced
+        learning_type:
+          type: array
+          items:
+            type: string
+            enum:
+              - videos
+              - websites
+              - visuals
+              - audio
+              - articles
+              - tutorials
+              - exercises
+        weeks:
+          type: integer
+          minimum: 1
+          maximum: 52
+        current_step:
+          type: integer
+          description: Where the user is currently on the learning path
+        completed_steps:
+          type: integer
+          description: How many steps the user has completed
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    WeeklyPlan:
+      type: object
+      description: Plans for each week to complete learningPath
+      required:
+        - week_number
+        - goal
+        - completion_status
       properties:
         id:
           type: integer
           readOnly: true
-        name:
-          type: string
-          description: Topic name like python etc
-        category:
-          type: string
-          description: like programming, data structure etc
-          enum:
-            - beginner
-            - intermediate
-            - advanced
-        created_at:
-          type: string
-          format: date-time
+        learning_path_id:
+          type: integer
+          description: Foreign key that refers to the learning path primary key
+        week_number:
+          type: integer
+          minimum: 1
+          maximum: 52
+        goal:
+          type: array
+          description: Short description of personal goal(s) on what to achieve
+          minItems: 1
+          maxItems: 3
+          items:
+            type: string
+            maxLength: 100
+        completion_status:
+          type: boolean
           readOnly: true
-    LearningPath:
+        plan_description:
+          type: string
+          maxLength: 1000
+    Resources:
       type: object
-      description: visualization of topics to master 
+      description: AI generated resources relating to provided topic
       required:
-        - id
-        - User_ID
-        - Current_step
-        - Completed_steps
+        - resource_type
+        - url
+        - resource_summary
       properties:
-        id: 
+        id:
           type: integer
-          description: id corresponding to generated learningpath
           readOnly: true
-        user_ID:
+        weekly_plan_id:
           type: integer
-          description: foreign key that refers to the user_ID
-        complete_steps:
-          type: integer
-          description: how many steps have the user completed
-          readOnly: true
-        current_step:
-          type: integer
-          description: where the user is currently on the learningpath
-
-
-
-
-      
+          description: Foreign key that refers to the weekly plan primary key
+        resource_type:
+          type: string
+          description: Has to be an option from the listed learning_type
+        resource_summary:
+          type: string
+          description: Summarize what the provided resource is about
+          maxLength: 300
+        url:
+          type: string
+          description: Link to the resource
+          maxLength: 2000
