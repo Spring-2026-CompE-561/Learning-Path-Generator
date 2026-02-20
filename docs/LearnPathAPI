@@ -227,7 +227,151 @@ paths:
           description: token expired
         '500':
           description: internal server issues
-    
+  /api/learningpaths/{id}:
+    get:
+      summary: get a specific learning path using id
+      description: returns progress about learning path
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Learning path retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  topic:
+                    type: string
+                  difficulty:
+                    type: string
+                  weeks_to_complete:
+                    type: integer
+                  current_step:
+                    type: integer
+                  completed_steps:
+                    type: integer
+                  estimated_mastery_date:
+                    type: string
+                    format: date
+        '401':
+          description: Unauthorized
+        '404':
+          description: Learning path not found
+        '500':
+          description: Server error
+
+    put:
+      summary: update/put the learning path
+      description: update proficiency level and learning type
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                proficiency:
+                  type: string
+                  enum: [beginner, intermediate, advanced]
+                learning_type:
+                  type: string
+                weeks_to_complete:
+                  type: integer
+      responses:
+        '401':
+          description: Unauthorized
+        '404':
+          description: Learning path not found
+        '500':
+          description: Server error
+
+    delete:
+      summary: delete learning path
+      description: removes the learning path permanently.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Learning path deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        '401':
+          description: Unauthorized
+        '404':
+          description: Learning path not found
+        '500':
+          description: Server error
+  /api/learningpaths/{id}/weeklyplan:
+    get:
+      summary: get weekly plans for learning path
+      description: returns all weekly milestones and progress
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the learning path
+      responses:
+        '200':
+          description: Weekly plans retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  learning_path_id:
+                    type: integer
+                  weeks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        week_id:
+                          type: integer
+                        week_number:
+                          type: integer
+                        goal:
+                          type: string
+                        completed:
+                          type: boolean
+        '401':
+          description: Unauthorized
+        '404':
+          description: Learning path not found
+        '500':
+          description: Server error  
+          
 #Data models(components)
 components:
   schemas:
