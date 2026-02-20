@@ -134,10 +134,108 @@ paths:
                     type: boolean
         '404':
           description: User not found
-
+  /api/auth/login:
+    post:
+      summary: sign in with user info
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: 
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: 
+                    type: string
+                  user:
+                    description: return user object to frontend so no extra API call needed
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name: 
+                        type: string
+                      email:
+                        type: string
+        '400':
+          description: Bad request
+        '401':
+          description: Wrong Username/Password
+  /api/auth/logout:
+    post:
+      summary: logout of the account
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: logout successfully
+        '500': 
+          description: server internal error
+  /api/learningpaths:
+    post:
+      description: user enters what they wanna learn, proficiency on the topic already*, type of learning*, weeks that they wanna learn it in 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                topic:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    difficulty:
+                      type: string
+      responses:
+        '201':
+          description: LearningPath successfully created
+        '500':
+          description: Internal server error
+    get:
+      description: gets and shows all the learning paths that the user is working on (planning to implement groq that will take on this info and make the weekly plans based off of it)
+      responses:
+        '200':
+          description: get all the learningPath the user currently working on
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  learningPath: 
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        topic: 
+                          type: string
+        '401':
+          description: token expired
+        '500':
+          description: internal server issues
+    
 #Data models(components)
 components:
   schemas:
+    securitySchemes:
+      bearerAuth:
+        type: http             # It's HTTP-based authentication
+        scheme: bearer         # Uses "bearer" token
+        bearerFormat: JWT      # JWT Tokens in this case
     User:
       type: object
       description: Represents an user account
@@ -177,8 +275,28 @@ components:
           type: string
           format: date-time
           description: time the user is created
-          readOnly: true #system-generated at time of creation
-    Roadmap:
+          readOnly: true 
+    Topic:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          description: Topic name like python etc
+        category:
+          type: string
+          description: like programming, data structure etc
+          enum:
+            - beginner
+            - intermediate
+            - advanced
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    LearningPath:
       type: object
       description: visualization of topics to master 
       required:
@@ -189,7 +307,7 @@ components:
       properties:
         id: 
           type: integer
-          description: id corresponding to generated roadmap
+          description: id corresponding to generated learningpath
           readOnly: true
         user_ID:
           type: integer
@@ -200,5 +318,9 @@ components:
           readOnly: true
         current_step:
           type: integer
-          description: where the user is currently on the roadmap
+          description: where the user is currently on the learningpath
+
+
+
+
       
