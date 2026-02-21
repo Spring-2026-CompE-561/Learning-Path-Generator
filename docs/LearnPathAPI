@@ -379,6 +379,15 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    oauth2Auth:
+      type: oauth2
+      flows:
+       password:
+         tokenUrl: /api/auth/login
+         scopes:
+          read: read access
+          write: write access
+          admin: admin access  
   schemas:
     User:
       type: object
