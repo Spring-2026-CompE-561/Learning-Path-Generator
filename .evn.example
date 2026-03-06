@@ -1,0 +1,3 @@
+SECRET_KEY= """THis is random key to be use by JWT tokens"""
+ALGORITHM="The algorithm use for JWT"
+ACCESS_TOKEN_EXPIRE_MINUTES= "minutes where the token will be expire"
