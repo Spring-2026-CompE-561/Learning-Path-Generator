@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     app_name: str = "Learning Path Generator"
     app_version: str = "1.0.0"
 
-    secret_key = Field(
+    secret_key: str = Field(
         default="dev_secret",
         description="The secret key for JWT",
     )
