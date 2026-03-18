@@ -14,3 +14,4 @@ class User(Base):
 
     # user.learning_paths to access list of learning paths associated with the user
     learning_paths = relationship("LearningPath", back_populates="user")
+    
