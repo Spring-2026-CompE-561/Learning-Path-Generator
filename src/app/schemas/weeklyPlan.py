@@ -22,6 +22,6 @@ class WeeklyPlanResponse(WeeklyPlanBase):
     """ Just return the ID for the system, in case we need to do any modification or referring 
     to specific plan
     """
-    weeklyplan_id: int
+    id: int
     model_config = {"from_attributes": True}
 
