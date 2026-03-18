@@ -8,7 +8,7 @@ class WeeklyPlan(Base):
     between the plan and learning_path when implementing endpoints"""
     __tablename__ = "weekly_plans"
 
-    weeklyplan_id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)
     learning_path_id = Column(Integer, ForeignKey("learning_paths.id"), nullable=False)
     week_number = Column(Integer, CheckConstraint('week_number >= 1 AND week_number <= 52', name='check_valid_week'), nullable=False)
     goal = Column(JSON)
