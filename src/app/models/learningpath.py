@@ -34,5 +34,5 @@ class LearningPath(Base):
     # connecting back and matching to the relationship called in User.py
     user = relationship("User", back_populates = "learning_paths")
 
-    # making new realtionship with the weekly 
+    # making new realtionship with the weekly plan
     weekly_plans = relationship("WeeklyPlan", back_populates = "learning_path")
