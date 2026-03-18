@@ -15,7 +15,7 @@ class Resource(Base):
     id = Column(Integer, primary_key = True, index = True)
 
     # waiting for weekly plan name 
-    weeklyplan_id = Column(Integer, ForeignKey("weeklyPlans.id"), nullable = False)
+    weeklyplan_id = Column(Integer, ForeignKey("weekly_plans.id"), nullable = False)
 
     # type of resouce that is chosen earlier, make sure that it is required
     resource_type = Column(String, nullable = False)
