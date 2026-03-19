@@ -17,6 +17,6 @@ class WeeklyPlan(Base):
 
     #Connect to the relationship in LearningPath 
     learning_path = relationship("LearningPath", back_populates="weekly_plans")
-    resources = relationship("Resource", back_populates="weekly_plans")
+    resources = relationship("Resource", back_populates="weekly_plan")
     
     
