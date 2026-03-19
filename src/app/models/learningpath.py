@@ -10,7 +10,7 @@ from app.core.database import Base
 # model named LearningPath
 class LearningPath(Base):
     __tablename__ = "learning_paths"
-
+  
     # new column named ID, primary key for learning path -> auto increment comes with primary key and every column is required by default
     id = Column(Integer, primary_key=True, index=True)
 
