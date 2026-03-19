@@ -20,6 +20,11 @@ class Settings(BaseSettings):
         default=10,
         description="Access token expiration time in minutes",
     )
+    # FIXME: change datapase later on if needed
+    database_url: str = Field(
+        default="sqlite:///./learning_paths.db",
+        description="The database URL",
+    )
 
     class Config:
         env_file = ".env"
