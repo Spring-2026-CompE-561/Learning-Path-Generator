@@ -1,4 +1,4 @@
-from core.auth import get_password_hash
+from app.core.auth import get_password_hash
 from app.repository.user import UserRepository
 from sqlalchemy.orm import Session
 
