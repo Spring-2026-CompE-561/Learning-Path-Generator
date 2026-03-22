@@ -23,6 +23,14 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserDB(UserBase):
+    """Schema for user data stored in the database.
+    This schema includes the hashed password, which is not exposed to the client.
+    """
+
+    hashed_password: str
+
+
 class User(UserBase):
     """Schema for user response.
     Two purposes for return id and email:
