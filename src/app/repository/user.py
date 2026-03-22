@@ -1,10 +1,16 @@
+from sqlalchemy.orm import Session
+from app.schemas.user import UserDB
+from app.models.user import User
+
+
 class UserRepository:
     """Repository class for user-related database operations."""
 
-    def __init__(self, db):
-        self.db = db
-
-    def create_user(self, user_data):
-        """Create a new user in the database.
-        This method will take user data and insert it into the users table.
-        """
+    @staticmethod
+    def create_user(db: Session, user_db: UserDB) -> User:
+        """Create a new user in the database."""
+        db_user = User(email=user_db.email, hashed_password=user_db.hashed_password)
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
