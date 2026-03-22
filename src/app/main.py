@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.settings import settings
 from app.core.database import Base, engine
+import app.models
 
 from app.routes.user import api_router as user_router
 

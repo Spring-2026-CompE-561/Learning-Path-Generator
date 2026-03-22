@@ -12,12 +12,13 @@ class UserBase(BaseModel):
     All user must have an email address.
     """
 
+    username: str
     email: EmailStr
 
 
 class UserCreate(UserBase):
     """Schema for creating a new user.
-    Only requires the email and password fields, to create a new user.
+    Only requires the email, username, and password fields, to create a new user.
     """
 
     password: str

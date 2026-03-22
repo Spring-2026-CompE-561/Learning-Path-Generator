@@ -22,6 +22,7 @@ class UserService:
         # Hash the password before creating the user
         hashed_password = get_password_hash(user_db.password)
         user_db = UserDB(
+            username=user_db.username,
             email=user_db.email,
             hashed_password=hashed_password,
         )

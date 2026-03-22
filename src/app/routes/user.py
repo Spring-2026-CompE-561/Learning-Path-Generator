@@ -15,7 +15,7 @@ api_router = APIRouter(prefix="/users", tags=["users"])
 
 # POST user registration endpoint
 @api_router.post(
-    "/register", response_model=UserCreate, status_code=status.HTTP_201_CREATED
+    "/register", response_model=UserSchema, status_code=status.HTTP_201_CREATED
 )
 # response model = what will be returned to the client when enter path user/register
 # status code, the status code being returned if the endpoint is successful
