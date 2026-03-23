@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.schemas.user import UserDB, UserCreate, User
 from fastapi import HTTPException, status
 
-from app.core.auth import verify_password
+from app.core.auth import verify_password, verify_token
 
 
 class UserService:
@@ -26,6 +26,31 @@ class UserService:
     def is_user_exists(self, db: Session, email: str) -> bool:
         """Check if a user with the given email already exists in the database."""
         return self.repository.get_by_mail(db, email) is not None
+
+    def get_current_user(self, db: Session, token: str) -> User | None:
+        """Get the current user based on the provided access token."""
+        payload = verify_token(token)
+        if not payload:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        email = payload.get("sub")
+        if email is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        user = self.repository.get_by_mail(db, email)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return user
 
     """Post functions"""
 
