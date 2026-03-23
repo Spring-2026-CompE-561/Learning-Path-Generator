@@ -3,11 +3,12 @@ from sqlalchemy.orm import Session
 from typing import Annotated
 
 from app.core.database import get_db
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, Token
 from app.services.user import user_service
 from app.schemas.user import User as UserSchema
 from app.repository.user import UserRepository as user_repository
 
+from fastapi.security import OAuth2PasswordRequestForm
 
 # Automatically appended to all endpoints in this router
 # prefix is for all path to have /users infront of it
@@ -42,6 +43,24 @@ async def delete_user(user_id: int, db: Annotated[Session, Depends(get_db)]) -> 
     return None
 
 
-@api_router.get("/login")
-async def read_users():
+# Post user login endpoint
+@api_router.post("/login", response_model=Token)
+async def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Annotated[Session, Depends(get_db)],
+) -> Token:
+    """
+    Login and get access token.
+
+    Arguments:
+        form_data: OAuth2 login form (username=email, password)
+        db: Database session
+
+    Returns:
+        Token: Access token for authenticated user
+
+    Raises:
+        HTTPException: If authentication fails (invalid credentials)
+    """
+
     return {"message": "List of users"}

@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.schemas.user import UserDB, UserCreate, User
 from fastapi import HTTPException, status
 
+from app.core.auth import verify_password
+
 
 class UserService:
     """Service class for user-related operations."""
@@ -59,6 +61,29 @@ class UserService:
             hashed_password=hashed_password,
         )
         return self.repository.create_user(db, user_db)
+
+    def authenticate(self, db: Session, email: str, password: str) -> User | None:
+        """Authenticate user with email and password.
+
+        Arguments:
+            db: Database session
+            email: User's email
+            password: User's plaintext password
+        Returns:
+            User | None: The authenticated user if credentials are valid, None otherwise.
+        """
+        user = self.repository.get_by_mail(db, email)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password",
+            )
+        if not verify_password(password, str(user.hashed_password)):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password",
+            )
+        return user
 
 
 user_service = UserService()
