@@ -7,6 +7,7 @@ from app.schemas.user import UserCreate, Token
 from app.services.user import user_service
 from app.schemas.user import User as UserSchema
 from app.repository.user import UserRepository as user_repository
+from app.core.auth import create_access_token
 
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -62,5 +63,16 @@ async def login(
     Raises:
         HTTPException: If authentication fails (invalid credentials)
     """
-
-    return {"message": "List of users"}
+    # autehnicate the user with the provided email and password
+    user = user_service.authenticate(
+        db, email=form_data.username, password=form_data.password
+    )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            details="Invalid email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    # create an access token for the authenticated user
+    access_token = create_access_token(data={"sub": user.email})
+    return Token(access_token=access_token, token_type="bearer")
