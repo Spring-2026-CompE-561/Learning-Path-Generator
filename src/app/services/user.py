@@ -6,6 +6,10 @@ from app.schemas.user import UserDB, UserCreate, User
 from fastapi import HTTPException, status
 
 from app.core.auth import verify_password, verify_token
+from app.core.auth import oauth2_scheme
+from app.core.database import get_db
+from fastapi import Depends
+from typing import Annotated
 
 
 class UserService:
@@ -15,27 +19,38 @@ class UserService:
         """Initialize the UserService with a UserRepository instance."""
         self.repository = UserRepository()
 
-    """Get functions"""
+    """Get functions or Read functions"""
 
     def get_by_mail(self, db: Session, email: str) -> User | None:
-        return self.repository.get_by_mail(db, email)
+        user_email = self.repository.get_by_mail(db, email)
+        if user_email is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+        return user_email
 
     def get_by_id(self, db: Session, user_id: int) -> User | None:
-        return self.repository.get_by_id(db, user_id)
+        user_id = self.repository.get_by_id(db, user_id)
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+        return user_id
 
     def is_user_exists(self, db: Session, email: str) -> bool:
         """Check if a user with the given email already exists in the database."""
         return self.repository.get_by_mail(db, email) is not None
 
-    def get_current_user(self, db: Session, token: str) -> User | None:
+    def get_current_user(
+        self,
+        db: Annotated[Session, Depends(get_db)],
+        token: Annotated[str, Depends(oauth2_scheme)],
+    ) -> User | None:
         """Get the current user based on the provided access token."""
         payload = verify_token(token)
-        if not payload:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+        # Extract the email from the token payload and retrieve the user from the database
         email = payload.get("sub")
         if email is None:
             raise HTTPException(
@@ -44,28 +59,21 @@ class UserService:
                 headers={"WWW-Authenticate": "Bearer"},
             )
         user = self.repository.get_by_mail(db, email)
-        if user is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not found",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
         return user
 
-    """Post functions"""
+    """Post functions or Create functions"""
 
     def register_user(self, db: Session, user_db: UserCreate) -> User:
-        "FIXME: adding validation"
         """Register a new user.
         create a new user in the database with validation.
 
         Arguments:
             db: Database session
             user_db: User creation data
-        
+
         Returns:
             User: The created user.
-        
+
         Raises:
             HTTPException: If the username or email is already exists.
         """

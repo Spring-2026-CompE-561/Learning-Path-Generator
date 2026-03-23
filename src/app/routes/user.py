@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from typing import Annotated
 
@@ -8,6 +8,7 @@ from app.services.user import user_service
 from app.schemas.user import User as UserSchema
 from app.repository.user import UserRepository as user_repository
 from app.core.auth import create_access_token
+from app.models.user import User as UserModel
 
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -32,15 +33,12 @@ async def register_user(
 
 
 # Delete user endpoint
-@api_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, db: Annotated[Session, Depends(get_db)]) -> None:
-    db_user = user_service.get_by_id(db, user_id)
-    if not db_user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
-    user_repository.delete_user(db, db_user)
+@api_router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserModel, Depends(user_service.get_current_user)],
+) -> None:
+    user_repository.delete_user(db, current_user)
     return None
 
 
@@ -67,12 +65,6 @@ async def login(
     user = user_service.authenticate(
         db, email=form_data.username, password=form_data.password
     )
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            details="Invalid email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
     # create an access token for the authenticated user
     access_token = create_access_token(data={"sub": user.email})
     return Token(access_token=access_token, token_type="bearer")

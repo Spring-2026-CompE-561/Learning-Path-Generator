@@ -6,7 +6,7 @@ from app.models.user import User
 class UserRepository:
     """Repository class for user-related database operations."""
 
-    "GET"
+    "Read"
 
     @staticmethod
     def get_by_mail(db: Session, email: str) -> User | None:
@@ -18,7 +18,7 @@ class UserRepository:
         """Get a user by ID."""
         return db.query(User).filter(User.id == user_id).first()
 
-    "POST"
+    "Create"
 
     @staticmethod
     def create_user(db: Session, user_db: UserDB) -> User:

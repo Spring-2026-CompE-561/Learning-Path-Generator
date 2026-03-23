@@ -7,13 +7,15 @@ from pwdlib import PasswordHash
 
 from app.core.settings import settings
 
+from fastapi import HTTPException, status
+
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 password_hash = PasswordHash.recommended()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
@@ -65,7 +67,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return password_hash.verify(plain_password, hashed_password)
 
 
-def verify_token(token: str) -> dict | None:
+def verify_token(token: str) -> dict:
     """
     Verify and decode a JWT token.
 
@@ -82,6 +84,10 @@ def verify_token(token: str) -> dict | None:
             algorithms=[settings.algorithm],
         )
     except PyJWTError:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     else:
         return payload
