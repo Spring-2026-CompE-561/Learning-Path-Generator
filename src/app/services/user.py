@@ -3,6 +3,7 @@ from app.repository.user import UserRepository
 from sqlalchemy.orm import Session
 
 from app.schemas.user import UserDB, UserCreate, User
+from fastapi import HTTPException, status
 
 
 class UserService:
@@ -12,7 +13,19 @@ class UserService:
         """Initialize the UserService with a UserRepository instance."""
         self.repository = UserRepository()
 
-    "Return a user model, database object"
+    """Get functions"""
+
+    def get_by_mail(self, db: Session, email: str) -> User | None:
+        return self.repository.get_by_mail(db, email)
+
+    def get_by_id(self, db: Session, user_id: int) -> User | None:
+        return self.repository.get_by_id(db, user_id)
+
+    def is_user_exists(self, db: Session, email: str) -> bool:
+        """Check if a user with the given email already exists in the database."""
+        return self.repository.get_by_mail(db, email) is not None
+
+    """Post functions"""
 
     def register_user(self, db: Session, user_db: UserCreate) -> User:
         "FIXME: adding validation"
@@ -31,6 +44,12 @@ class UserService:
         """
 
         # Check if user already exists with the same username or email
+        existing_user = self.is_user_exists(db, user_db.email)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
 
         # Hash the password before creating the user
         hashed_password = get_password_hash(user_db.password)
