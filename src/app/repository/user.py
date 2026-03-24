@@ -43,6 +43,14 @@ class UserRepository:
         db.refresh(db_user)
         return db_user
 
+    @staticmethod
+    def token_revoke(db: Session, db_user: User) -> User:
+        """Revoke all existing tokens for a user by incrementing the token version."""
+        db_user.token_version += 1
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+
     "DELETE"
 
     @staticmethod
