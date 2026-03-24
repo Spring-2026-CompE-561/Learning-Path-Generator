@@ -58,6 +58,14 @@ class UserService:
                 detail="Invalid token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+        # extract the token version from the token payload
+        token_version = payload.get("token_version")
+        if token_version is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         user = self.repository.get_by_id(db, int(user_id))
         return user
 

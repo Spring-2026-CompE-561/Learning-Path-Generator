@@ -76,5 +76,7 @@ async def login(
         db, email=form_data.username, password=form_data.password
     )
     # create an access token for the authenticated user
-    access_token = create_access_token(data={"sub": str(user.id)})
+    access_token = create_access_token(
+        data={"sub": str(user.id), "token_version": user.token_version}
+    )
     return Token(access_token=access_token, token_type="bearer")
