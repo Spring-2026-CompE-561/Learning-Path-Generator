@@ -32,7 +32,7 @@ class UserDB(UserBase):
     hashed_password: str
 
 
-class User(UserBase):
+class UserResponse(UserBase):
     """Schema for user response.
     Two purposes for return id and email:
         1. Confirmation of the user creation for client.
@@ -42,6 +42,16 @@ class User(UserBase):
 
     id: int
     model_config = {"from_attributes": True}
+
+
+class UserUpdate(BaseModel):
+    """Schema for updating user information.
+    This schema allows partial updates, where only the fields provided by the client will be updated.
+    """
+
+    username: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
 
 
 class Token(BaseModel):
