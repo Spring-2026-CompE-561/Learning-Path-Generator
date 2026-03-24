@@ -141,5 +141,9 @@ class UserService:
             db_user.hashed_password = get_password_hash(user_db.password)
         return self.repository.update_user(db, db_user)
 
+    def revoke_tokens(self, db: Session, db_user: UserResponse) -> UserResponse:
+        """Revoke all existing tokens for a user by incrementing the token version."""
+        return self.repository.token_revoke(db, db_user)
+
 
 user_service = UserService()
