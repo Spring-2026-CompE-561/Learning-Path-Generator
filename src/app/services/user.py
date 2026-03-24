@@ -8,7 +8,6 @@ from fastapi import HTTPException, status
 from app.core.auth import verify_password, verify_token
 from app.core.auth import oauth2_scheme
 from app.core.database import get_db
-from app.models.user import User as UserModel
 from fastapi import Depends
 from typing import Annotated
 
@@ -48,7 +47,7 @@ class UserService:
         self,
         db: Annotated[Session, Depends(get_db)],
         token: Annotated[str, Depends(oauth2_scheme)],
-    ) -> UserModel | None:
+    ) -> UserResponse | None:
         """Get the current user based on the provided access token."""
         payload = verify_token(token)
         # Extract the user ID from the token payload and retrieve the user from the database
