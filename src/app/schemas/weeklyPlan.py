@@ -12,8 +12,6 @@ class WeeklyPlanBase(BaseModel):
     week_number: int
     goal: List[str]
     plan_description: str
-    learning_path_id: int
-    completion_status: bool = False
 
 class WeeklyPlanCreate(WeeklyPlanBase): 
     pass
@@ -23,5 +21,7 @@ class WeeklyPlanResponse(WeeklyPlanBase):
     to specific plan
     """
     id: int
+    learning_path_id: int
+    completion_status: bool = False
     model_config = {"from_attributes": True}
 
