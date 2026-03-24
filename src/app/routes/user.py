@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from typing import Annotated
 
 from app.core.database import get_db
-from app.schemas.user import UserCreate, Token
+from app.schemas.user import UserCreate, Token, UserUpdate
 from app.services.user import user_service
-from app.schemas.user import User as UserSchema
+from app.schemas.user import UserResponse as UserSchema
 from app.repository.user import UserRepository as user_repository
 from app.core.auth import create_access_token
 from app.models.user import User as UserModel
@@ -30,6 +30,16 @@ async def register_user(
     # input is based on UserCreate Schema
     # db getting the database session from the get_db function
     return user_service.register_user(db, user)
+
+
+# Update user endpoint
+@api_router.put("/update", response_model=UserSchema)
+async def update_user(
+    user_update: UserUpdate,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserModel, Depends(user_service.get_current_user)],
+) -> UserSchema:
+    return user_service.update_user(db, current_user, user_update)
 
 
 # Delete user endpoint
@@ -66,5 +76,5 @@ async def login(
         db, email=form_data.username, password=form_data.password
     )
     # create an access token for the authenticated user
-    access_token = create_access_token(data={"sub": user.email})
+    access_token = create_access_token(data={"sub": str(user.id)})
     return Token(access_token=access_token, token_type="bearer")
