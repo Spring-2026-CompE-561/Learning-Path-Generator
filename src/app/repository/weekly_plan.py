@@ -52,8 +52,11 @@ class WeeklyPlanRepository:
         db: Session, db_weekly_plan: WeeklyPlan, updates: dict
     ) -> WeeklyPlan:
         """Update a weekly plan with the given fields."""
+        allowed_fields = {"week_number", "goal", "plan_description"}
+
         for key, value in updates.items():
-            setattr(db_weekly_plan, key, value)
+            if key in allowed_fields:
+                setattr(db_weekly_plan, key, value)
         db.commit()
         db.refresh(db_weekly_plan)
         return db_weekly_plan

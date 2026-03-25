@@ -49,8 +49,12 @@ class LearningPathRepository:
         db: Session, db_learning_path: LearningPath, updates: dict
     ) -> LearningPath:
         """Update a learning path with the given fields."""
+        allowed_fields = {"topic", "proficiency", "learning_type", "weeks"}
+
         for key, value in updates.items():
-            setattr(db_learning_path, key, value)
+            if key in allowed_fields:
+                setattr(db_learning_path, key, value)
+
         db.commit()
         db.refresh(db_learning_path)
         return db_learning_path

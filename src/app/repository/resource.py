@@ -53,8 +53,11 @@ class ResourceRepository:
         db: Session, db_resource: Resource, updates: dict
     ) -> Resource:
         """Update a resource with the given fields."""
+        allowed_fields = {"resource_type", "resource_summary", "url"}
+
         for key, value in updates.items():
-            setattr(db_resource, key, value)
+            if key in allowed_fields:
+                setattr(db_resource, key, value)
         db.commit()
         db.refresh(db_resource)
         return db_resource
