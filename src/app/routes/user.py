@@ -82,6 +82,7 @@ async def login(
     return Token(access_token=access_token, token_type="bearer")
 
 
+# FIXME: Logout endpoint do not account for multiple devices, as it will revoke all tokens for the user, including those used on other devices.
 # post user logout endpoint
 @api_router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def Logout(
