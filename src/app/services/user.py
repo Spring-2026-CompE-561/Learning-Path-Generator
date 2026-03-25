@@ -67,6 +67,17 @@ class UserService:
                 headers={"WWW-Authenticate": "Bearer"},
             )
         user = self.repository.get_by_id(db, int(user_id))
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+        if user.token_version != token_version:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         return user
 
     """Post functions or Create functions"""
