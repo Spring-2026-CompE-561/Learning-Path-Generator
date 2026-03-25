@@ -13,8 +13,6 @@ class WeeklyPlanBase(BaseModel):
     week_number: int
     goal: List[str]
     plan_description: str
-    learning_path_id: int
-    completion_status: bool = False
 
 
 class WeeklyPlanCreate(WeeklyPlanBase):
@@ -27,4 +25,6 @@ class WeeklyPlanResponse(WeeklyPlanBase):
     """
 
     id: int
+    learning_path_id: int
+    completion_status: bool = False
     model_config = {"from_attributes": True}
