@@ -7,6 +7,9 @@ from app.core.database import Base, engine
 import app.models
 
 from app.routes.user import api_router as user_router
+from app.routes.learning_path import api_router as learning_path_router
+from app.routes.weekly_plan import api_router as weekly_plan_router
+from app.routes.resource import api_router as resource_router
 
 # create database tables
 # if the tables do not exist, create them
@@ -21,6 +24,9 @@ app = FastAPI(
 
 # adding the user router to the main app
 app.include_router(user_router)
+app.include_router(learning_path_router)
+app.include_router(weekly_plan_router)
+app.include_router(resource_router)
 
 # configure CORRS middleware to allow requests from any origin
 app.add_middleware(
