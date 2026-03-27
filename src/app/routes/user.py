@@ -76,5 +76,18 @@ async def login(
         db, email=form_data.username, password=form_data.password
     )
     # create an access token for the authenticated user
-    access_token = create_access_token(data={"sub": str(user.id)})
+    access_token = create_access_token(
+        data={"sub": str(user.id), "token_version": user.token_version}
+    )
     return Token(access_token=access_token, token_type="bearer")
+
+
+# FIXME: Logout endpoint do not account for multiple devices, as it will revoke all tokens for the user, including those used on other devices.
+# post user logout endpoint
+@api_router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def Logout(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[UserModel, Depends(user_service.get_current_user)],
+) -> None:
+    user_service.revoke_tokens(db, current_user)
+    return None

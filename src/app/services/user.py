@@ -58,7 +58,26 @@ class UserService:
                 detail="Invalid token",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+        # extract the token version from the token payload
+        token_version = payload.get("token_version")
+        if token_version is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         user = self.repository.get_by_id(db, int(user_id))
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+        if user.token_version != token_version:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         return user
 
     """Post functions or Create functions"""
@@ -132,6 +151,10 @@ class UserService:
         if user_db.password:
             db_user.hashed_password = get_password_hash(user_db.password)
         return self.repository.update_user(db, db_user)
+
+    def revoke_tokens(self, db: Session, db_user: UserResponse) -> UserResponse:
+        """Revoke all existing tokens for a user by incrementing the token version."""
+        return self.repository.token_revoke(db, db_user)
 
 
 user_service = UserService()
