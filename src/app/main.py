@@ -1,10 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi import Request
 
 from app.core.settings import settings
 from app.core.database import Base, engine
 import app.models
+import logging
+import time
+
 
 from app.routes.user import api_router as user_router
 from app.routes.learning_path import api_router as learning_path_router
@@ -37,3 +40,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Configure logging to output INFO level logs to the terminal
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Middleware that runs on every HTTP request
+# Logs the method, path, status code, and response time for each request
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start = time.time()
+    response = await call_next(request)
+    duration = time.time() - start
+    logger.info(f"{request.method} {request.url.path} - {response.status_code} ({duration:.2f}s)")
+    return response
