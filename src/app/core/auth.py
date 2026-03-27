@@ -1,9 +1,13 @@
-from datetime import UTC, datetime, timedelta
-
 import jwt
+
+from datetime import UTC, datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
 from jwt import PyJWTError
 from pwdlib import PasswordHash
+from fastapi import Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from app.core.database import get_db
+from app.repository.user import UserRepository
 
 from app.core.settings import settings
 
@@ -91,3 +95,14 @@ def verify_token(token: str) -> dict:
         )
     else:
         return payload
+    
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    payload = verify_token(token)
+    email: str = payload.get("sub")
+    if email is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+
+    user = UserRepository.get_by_mail(db, email)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    return user

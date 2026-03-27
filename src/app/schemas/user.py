@@ -5,6 +5,7 @@ Basically, the modeling of various response A user could do for a specific reque
 """
 
 from pydantic import BaseModel, EmailStr
+from pydantic import field_validator
 
 
 class UserBase(BaseModel):
@@ -22,6 +23,13 @@ class UserCreate(UserBase):
     """
 
     password: str
+
+    @field_validator("password")
+    @classmethod
+    def password_not_empty(cls, v):
+        if not v.strip():
+            raise ValueError("Password cannot be empty")
+        return v
 
 
 class UserDB(UserBase):
