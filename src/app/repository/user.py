@@ -34,6 +34,15 @@ class UserRepository:
         db.refresh(db_user)
         return db_user
 
+    "Update"
+
+    @staticmethod
+    def update_user(db: Session, db_user: User) -> User:
+        """Update an existing user in the database."""
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+
     "DELETE"
 
     @staticmethod
