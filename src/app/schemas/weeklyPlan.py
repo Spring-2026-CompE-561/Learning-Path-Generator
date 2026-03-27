@@ -17,6 +17,7 @@ class WeeklyPlanBase(BaseModel):
 
 class WeeklyPlanCreate(WeeklyPlanBase):
     pass
+    learning_path_id: int
 
 
 class WeeklyPlanResponse(WeeklyPlanBase):
