@@ -30,7 +30,7 @@ class LearningPath(Base):
     weeks = Column(Integer, nullable=False)
 
     # this will make sure that when created it will set the time to what it currently is
-    create_at = Column(DateTime, server_default=func.now())
+    created_at = Column(DateTime, server_default=func.now())
 
     # connecting back and matching to the relationship called in User.py
     user = relationship("User", back_populates="learning_paths")
