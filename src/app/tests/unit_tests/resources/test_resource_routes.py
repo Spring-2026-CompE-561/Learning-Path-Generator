@@ -1,34 +1,70 @@
 import pytest
-from sqlalchemy.orm import Session
-from fastapi import HTTPException
+from fastapi.testclient import TestClient
 from app.services.resource import resource_service
+from app.core.auth import create_access_token
 
-# tests made for service functions of resource
-
-
-def test_get_by_id_exists(db: Session, test_weekly_plan):
-    created = resource_service.create_resource(
-        db,
-        test_weekly_plan.id,
-        "video",
-        "Intro to Python",
-        "https://example.com/video",
-    )
-
-    result = resource_service.get_by_id(db, created.id)
-
-    # makes sure that result has something and that its the same id
-    assert result is not None
-    assert result.id == created.id
+# tests made for the routes part of resource
 
 
-def test_get_by_id_not_found(db: Session):
-    with pytest.raises(HTTPException) as error:
-        resource_service.get_by_id(db, 9999)
-    assert error.value.status_code == 404
+def get_auth_header(user):
+    token = create_access_token(data={"sub": str(user.id), "token_version": user.token_version})
+    return {"Authorization": f"Bearer {token}"}
 
 
-def test_get_all_by_weekly_plan(db: Session, test_weekly_plan):
+def test_create_resource(client: TestClient, db, test_user, test_weekly_plan):
+    headers = get_auth_header(test_user)
+    response = client.post("/resources/", json={
+        "weekly_plan_id": test_weekly_plan.id,
+        "resource_type": "video",
+        "resource_summary": "Intro to Python",
+        "url": "https://example.com/video",
+    }, headers=headers)
+
+    assert response.status_code == 201
+    data = response.json()
+    assert data["resource_type"] == "video"
+    assert data["url"] == "https://example.com/video"
+
+
+def test_create_unauthorized(client: TestClient, test_weekly_plan):
+    # should return 401 if no token provided
+    response = client.post("/resources/", json={
+        "weekly_plan_id": test_weekly_plan.id,
+        "resource_type": "video",
+        "resource_summary": "Summary",
+        "url": "https://example.com/video",
+    })
+    assert response.status_code == 401
+
+
+def test_create_missing_fields(client: TestClient, test_user, test_weekly_plan):
+    # missing resource_type should return 422
+    headers = get_auth_header(test_user)
+    response = client.post("/resources/", json={
+        "weekly_plan_id": test_weekly_plan.id,
+        "resource_summary": "Summary",
+        "url": "https://example.com",
+    }, headers=headers)
+    assert response.status_code == 422
+
+
+def test_create_duplicate_url(client: TestClient, db, test_user, test_weekly_plan):
+    # creating two resources with the same url should return 400
+    headers = get_auth_header(test_user)
+    payload = {
+        "weekly_plan_id": test_weekly_plan.id,
+        "resource_type": "video",
+        "resource_summary": "Summary",
+        "url": "https://example.com/video",
+    }
+    client.post("/resources/", json=payload, headers=headers)
+
+    response = client.post("/resources/", json=payload, headers=headers)
+    assert response.status_code == 400
+
+
+def test_get_all_by_weekly_plan(client: TestClient, db, test_user, test_weekly_plan):
+    headers = get_auth_header(test_user)
     resource_service.create_resource(
         db, test_weekly_plan.id, "video", "Vid", "https://example.com/1"
     )
@@ -36,70 +72,54 @@ def test_get_all_by_weekly_plan(db: Session, test_weekly_plan):
         db, test_weekly_plan.id, "article", "Article", "https://example.com/2"
     )
 
-    results = resource_service.get_all_by_weekly_plan(db, test_weekly_plan.id)
-    assert len(results) == 2
+    response = client.get(f"/resources/weekly-plan/{test_weekly_plan.id}", headers=headers)
+    assert response.status_code == 200
+    assert len(response.json()) == 2
 
 
-def test_create_resource(db: Session, test_weekly_plan):
-    result = resource_service.create_resource(
-        db,
-        test_weekly_plan.id,
-        "video",
-        "Intro to Python",
-        "https://example.com/video",
-    )
-
-    # make sure theres an id and it matches the weekly plan
-    assert result.id is not None
-    assert result.weeklyplan_id == test_weekly_plan.id
-    assert result.url == "https://example.com/video"
+def test_get_all_unauthorized(client: TestClient, test_weekly_plan):
+    response = client.get(f"/resources/weekly-plan/{test_weekly_plan.id}")
+    assert response.status_code == 401
 
 
-def test_create_duplicate_url(db: Session, test_weekly_plan):
-    # creating the same url twice in the same weekly plan should raise an error
-    resource_service.create_resource(
-        db, test_weekly_plan.id, "video", "Summary", "https://example.com/video"
-    )
-
-    # if you create two resources with the same url it should raise an error
-    with pytest.raises(HTTPException) as error:
-        resource_service.create_resource(
-            db, test_weekly_plan.id, "article", "Summary 2", "https://example.com/video"
-        )
-    assert error.value.status_code == 400
-
-
-def test_update_resource(db: Session, test_weekly_plan):
-    created = resource_service.create_resource(
-        db, test_weekly_plan.id, "video", "Old summary", "https://example.com"
-    )
-
-    result = resource_service.update_resource(db, created.id, {"resource_summary": "New summary"})
-
-    assert result.resource_summary == "New summary"
-    assert result.resource_type == "video"
-
-
-def test_update_not_found(db: Session):
-    with pytest.raises(HTTPException) as error:
-        resource_service.update_resource(db, 9999, {"resource_summary": "New"})
-    assert error.value.status_code == 404
-
-
-def test_delete_resource(db: Session, test_weekly_plan):
+def test_get_specific_resource(client: TestClient, db, test_user, test_weekly_plan):
+    headers = get_auth_header(test_user)
     created = resource_service.create_resource(
         db, test_weekly_plan.id, "video", "Summary", "https://example.com"
     )
 
-    resource_service.delete_resource(db, created.id)
-
-    # check that by trying to get it, it will give a 404
-    with pytest.raises(HTTPException) as error:
-        resource_service.get_by_id(db, created.id)
-    assert error.value.status_code == 404
+    response = client.get(f"/resources/{created.id}", headers=headers)
+    assert response.status_code == 200
+    assert response.json()["id"] == created.id
 
 
-def test_delete_not_found(db: Session):
-    with pytest.raises(HTTPException) as error:
-        resource_service.delete_resource(db, 9999)
-    assert error.value.status_code == 404
+def test_get_specific_not_found(client: TestClient, test_user):
+    headers = get_auth_header(test_user)
+    response = client.get("/resources/9999", headers=headers)
+    assert response.status_code == 404
+
+
+def test_get_specific_unauthorized(client: TestClient):
+    response = client.get("/resources/9999")
+    assert response.status_code == 401
+
+
+def test_delete_resource(client: TestClient, db, test_user, test_weekly_plan):
+    headers = get_auth_header(test_user)
+    created = resource_service.create_resource(
+        db, test_weekly_plan.id, "video", "Summary", "https://example.com"
+    )
+
+    response = client.delete(f"/resources/{created.id}", headers=headers)
+    assert response.status_code == 204
+
+
+def test_delete_not_found(client: TestClient, test_user):
+    headers = get_auth_header(test_user)
+    response = client.delete("/resources/9999", headers=headers)
+    assert response.status_code == 404
+
+
+def test_delete_unauthorized(client: TestClient):
+    response = client.delete("/resources/1")
+    assert response.status_code == 401
