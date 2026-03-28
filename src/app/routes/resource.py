@@ -3,7 +3,11 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.services.resource import resource_service
-from app.schemas.resource import Resource as ResourceSchema, ResourseCreate
+from app.schemas.resource import (
+    Resource as ResourceSchema,
+    ResourseCreate,
+    ResourceUpdate,
+)
 
 from app.models.user import User as UserModel
 from app.services.user import user_service
@@ -62,11 +66,16 @@ def get_using_specificid(
 @api_router.put("/{resource_id}", response_model=ResourceSchema)
 def updating_resource(
     resource_id: int,
-    updates: dict,
+    updates: ResourceUpdate,
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(user_service.get_current_user),
 ):
-    return resource_service.update_resource(db, resource_id, updates)
+    return resource_service.update_resource(
+        db,
+        resource_id,
+        # Convert pydantic model into dictionary, but only includes fields the user atually provided
+        updates.model_dump(exclude_unset=True),
+    )
 
 
 """Delete the resource, return 204 no content"""

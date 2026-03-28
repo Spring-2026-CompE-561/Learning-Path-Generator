@@ -85,6 +85,10 @@ class ResourceService:
             HTTPException: If resource not found.
         """
         resource = self.get_by_id(db, resource_id)
+        # extract HttpUrl type as string
+        if "url" in updates and updates["url"] is not None:
+            updates["url"] = str(updates["url"])
+
         return self.repository.update_resource(db, resource, updates)
 
     """Delete functions"""
