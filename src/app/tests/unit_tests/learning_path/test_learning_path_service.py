@@ -4,7 +4,8 @@ from fastapi import HTTPException
 from app.services.learning_path import learning_path_service
 from app.schemas.learningpath import LearningPathCreate
 
-# tests made for service functions of learning paths 
+# tests made for service functions of learning paths
+
 
 def test_get_by_id_exists(db: Session, test_user):
     data = LearningPathCreate(
@@ -65,13 +66,17 @@ def test_update_learning_path(db: Session, test_user):
         weeks=8,
     )
     created = learning_path_service.create_learning_path(db, data, test_user.id)
-    result = learning_path_service.update_learning_path(db, created.id, test_user.id, {"weeks": 12})
+    result = learning_path_service.update_learning_path(
+        db, created.id, test_user.id, {"weeks": 12}
+    )
     assert result.weeks == 12
 
 
 def test_update_not_found(db: Session, test_user):
     with pytest.raises(HTTPException) as error:
-        learning_path_service.update_learning_path(db, 9999, test_user.id, {"weeks": 12})
+        learning_path_service.update_learning_path(
+            db, 9999, test_user.id, {"weeks": 12}
+        )
     assert error.value.status_code == 404
 
 

@@ -74,7 +74,9 @@ def test_update_resource(db: Session, test_weekly_plan):
         db, test_weekly_plan.id, "video", "Old summary", "https://example.com"
     )
 
-    result = resource_service.update_resource(db, created.id, {"resource_summary": "New summary"})
+    result = resource_service.update_resource(
+        db, created.id, {"resource_summary": "New summary"}
+    )
 
     assert result.resource_summary == "New summary"
     assert result.resource_type == "video"

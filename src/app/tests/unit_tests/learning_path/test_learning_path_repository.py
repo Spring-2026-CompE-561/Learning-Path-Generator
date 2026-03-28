@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.repository.learning_path import LearningPathRepository
 from app.schemas.learningpath import LearningPathCreate
 
+
 # tests made for the repository functions of learning path, same as others, not really commented since explained already in weekly plans
 def test_create_learning_path(db: Session, test_user):
     data = LearningPathCreate(

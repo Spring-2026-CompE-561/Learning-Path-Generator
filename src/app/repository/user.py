@@ -18,6 +18,11 @@ class UserRepository:
         """Get a user by ID."""
         return db.query(User).filter(User.id == user_id).first()
 
+    @staticmethod
+    def get_by_username(db: Session, user_name: str) -> User | None:
+        """Get a user by username"""
+        return db.query(User).filter(User.username == user_name).first()
+
     "Create"
 
     @staticmethod

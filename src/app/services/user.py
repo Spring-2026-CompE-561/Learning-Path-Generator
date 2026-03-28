@@ -104,6 +104,12 @@ class UserService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered",
             )
+        existing_username = self.repository.get_by_username(db, user_db.username)
+        if existing_username:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already registered",
+            )
 
         # Hash the password before creating the user
         hashed_password = get_password_hash(user_db.password)

@@ -1,4 +1,3 @@
-import pytest
 from fastapi.testclient import TestClient
 from app.schemas.learningpath import LearningPathCreate
 from app.services.learning_path import learning_path_service
@@ -6,19 +5,26 @@ from app.core.auth import create_access_token
 
 # tests made for routes in learning paths, similar to weekly plans which has comments already explaining what things do
 
+
 def get_auth_header(user):
-    token = create_access_token(data={"sub": str(user.id), "token_version": user.token_version})
+    token = create_access_token(
+        data={"sub": str(user.id), "token_version": user.token_version}
+    )
     return {"Authorization": f"Bearer {token}"}
 
 
 def test_create_learning_path(client: TestClient, db, test_user):
     headers = get_auth_header(test_user)
-    response = client.post("/learning-paths/", json={
-        "topic": "test",
-        "proficency": "beginner",
-        "learning_type": ["video"],
-        "weeks": 8,
-    }, headers=headers)
+    response = client.post(
+        "/learning-paths/",
+        json={
+            "topic": "test",
+            "proficency": "beginner",
+            "learning_type": ["video"],
+            "weeks": 8,
+        },
+        headers=headers,
+    )
     assert response.status_code == 201
     data = response.json()
     assert data["topic"] == "test"
@@ -26,20 +32,27 @@ def test_create_learning_path(client: TestClient, db, test_user):
 
 
 def test_create_unauthorized(client: TestClient):
-    response = client.post("/learning-paths/", json={
-        "topic": "singing",
-        "proficency": "beginner",
-        "learning_type": ["video"],
-        "weeks": 8,
-    })
+    response = client.post(
+        "/learning-paths/",
+        json={
+            "topic": "singing",
+            "proficency": "beginner",
+            "learning_type": ["video"],
+            "weeks": 8,
+        },
+    )
     assert response.status_code == 401
 
 
 def test_create_missing_fields(client: TestClient, test_user):
     headers = get_auth_header(test_user)
-    response = client.post("/learning-paths/", json={
-        "topic": "rapping",
-    }, headers=headers)
+    response = client.post(
+        "/learning-paths/",
+        json={
+            "topic": "rapping",
+        },
+        headers=headers,
+    )
     assert response.status_code == 422
 
 
@@ -91,7 +104,9 @@ def test_update_learning_path(client: TestClient, db, test_user):
         weeks=8,
     )
     created = learning_path_service.create_learning_path(db, data, test_user.id)
-    response = client.put(f"/learning-paths/{created.id}", json={"weeks": 12}, headers=headers)
+    response = client.put(
+        f"/learning-paths/{created.id}", json={"weeks": 12}, headers=headers
+    )
     assert response.status_code == 200
 
 

@@ -3,6 +3,7 @@ from app.models.user import User
 from app.models.learningpath import LearningPath
 from app.models.weeklyPlan import WeeklyPlan
 
+
 # resource needs a user -> learning path -> weekly plan -> resource
 @pytest.fixture
 def test_user(db):
@@ -17,6 +18,7 @@ def test_user(db):
     db.refresh(user)
     return user
 
+
 # learning path needed for weekly plan
 @pytest.fixture
 def test_learning_path(db, test_user):
@@ -29,6 +31,7 @@ def test_learning_path(db, test_user):
     db.commit()
     db.refresh(learning_path)
     return learning_path
+
 
 # weekly plan needed for resource
 @pytest.fixture
