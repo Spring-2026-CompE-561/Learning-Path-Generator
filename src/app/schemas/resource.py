@@ -13,21 +13,23 @@ class ResourceBase(BaseModel):
     # Field sets max length to 300 and ... makes it req, used to describe what your resource does
     resource_summary: str = Field(..., max_length=300)
 
-    url: str = Field(..., max_length=2000)
+    url: HttpUrl
 
 
 class ResourceUpdate(BaseModel):
     """meant to be used if they want to switch the resources given, required to give description as to what they want instead for better resources"""
 
-    message: str
+    resource_type: Literal["video", "audio", "article", "problems", "course"] | None = (
+        None
+    )
+    resource_summary: str | None = Field(None, max_length=300)
+    url: HttpUrl | None = None
 
 
-class ResourseCreate(BaseModel):
+class ResourseCreate(ResourceBase):
     """To validate when to create Resource"""
+
     weekly_plan_id: int
-    resource_type: Literal["video", "audio", "article", "problems", "course"]
-    resource_summary: str = Field(..., max_lenght=300)
-    url: HttpUrl
 
 
 class Resource(ResourceBase):

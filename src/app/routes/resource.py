@@ -14,6 +14,7 @@ api_router = APIRouter(prefix="/resources", tags=["resources"])
 """Creating the resourca tied to plan"""
 
 
+# FIXME: Does not check whether the weekly_plan exist or not
 @api_router.post(
     "/", response_model=ResourceSchema, status_code=status.HTTP_201_CREATED
 )
