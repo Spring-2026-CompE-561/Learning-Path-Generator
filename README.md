@@ -39,7 +39,7 @@ uv sync --group dev
 ### 3. Set up environment variables
 
 ```bash
-cp .evn.example .env
+cp .env.example .env
 ```
 
 Edit `.env` and configure:
