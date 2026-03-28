@@ -5,10 +5,11 @@ from app.core.database import get_db
 from app.services.resource import resource_service
 from app.schemas.resource import (
     Resource as ResourceSchema,
-    ResourseCreate,
     ResourceUpdate,
+    ResourceCreate,
 )
 
+from app.services.weekly_plan import weekly_plan_service
 from app.models.user import User as UserModel
 from app.services.user import user_service
 
@@ -23,10 +24,11 @@ api_router = APIRouter(prefix="/resources", tags=["resources"])
     "/", response_model=ResourceSchema, status_code=status.HTTP_201_CREATED
 )
 def create_resource(
-    payload: ResourseCreate,
+    payload: ResourceCreate,
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(user_service.get_current_user),
 ):
+    weekly_plan_service.get_by_id(db, payload.weekly_plan_id)
     return resource_service.create_resource(
         db,
         payload.weekly_plan_id,
@@ -44,7 +46,8 @@ def get_all(
     weekly_plan_id: int,
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(user_service.get_current_user),
-):
+):  
+    weekly_plan_service.get_by_id(db, weekly_plan_id)
     return resource_service.get_all_by_weekly_plan(db, weekly_plan_id)
 
 

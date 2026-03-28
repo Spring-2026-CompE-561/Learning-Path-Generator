@@ -26,7 +26,7 @@ class ResourceUpdate(BaseModel):
     url: HttpUrl | None = None
 
 
-class ResourseCreate(ResourceBase):
+class ResourceCreate(ResourceBase):
     """To validate when to create Resource"""
 
     weekly_plan_id: int
