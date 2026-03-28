@@ -152,3 +152,114 @@ uv run pre-commit run --all-files
 ## Full API Spec
 
 See [docs/LearnPathAPI.yaml](docs/LearnPathAPI.yaml) for the complete OpenAPI 3.0.3 specification.
+
+
+# How to run tests
+
+# Testing Guide
+
+## Setup
+
+Make sure you have the dev dependencies installed and a `.env` file at the project root:
+
+```bash
+uv sync --group dev
+```
+
+Your `.env` should have:
+```
+SECRET_KEY=your_secret_key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+DATABASE_URL=sqlite:///./learning_paths.db
+```
+
+All tests use an isolated SQLite test database so your real data is never touched.
+## Running All Tests
+
+```bash
+uv run pytest src/app/tests/ -v
+```
+
+## Running Tests by Object
+
+### User
+```bash
+uv run pytest src/app/tests/unit_tests/user/ -v
+```
+
+### Learning Path
+```bash
+uv run pytest src/app/tests/unit_tests/learning_path/ -v
+```
+
+### Weekly Plan
+```bash
+uv run pytest src/app/tests/unit_tests/weekly_plan/ -v
+```
+
+### Resource
+```bash
+uv run pytest src/app/tests/unit_tests/resources/ -v
+```
+
+---
+
+## Running Tests by Layer
+
+### Repository only (database operations)
+```bash
+uv run pytest src/app/tests/ -v -k "repository"
+```
+
+### Service only (business logic)
+```bash
+uv run pytest src/app/tests/ -v -k "service"
+```
+
+### Routes only (HTTP endpoints)
+```bash
+uv run pytest src/app/tests/ -v -k "routes"
+```
+
+## Running a Single Test
+
+```bash
+uv run pytest src/app/tests/unit_tests/user/test_user_routes.py::test_register_user_success -v
+```
+
+---
+
+## Test Structure
+
+```
+src/app/tests/
+    conftest.py                          # shared fixtures (db, client)
+    unit_tests/
+        user/
+            conftest.py                  # user fixtures
+            test_user_repository.py
+            test_user_routes.py
+            test_user_service.py
+        learning_path/
+            conftest.py                  # learning path fixtures
+            test_learning_path_repository.py
+            test_learning_path_routes.py
+            test_learning_path_service.py
+        weekly_plan/
+            conftest.py                  # weekly plan fixtures
+            test_weekly_plan_repository.py
+            test_weekly_plan_routes.py
+            test_weekly_plan_service.py
+        resources/
+            conftest.py                  # resource fixtures
+            test_resource_repository.py
+            test_resource_routes.py
+            test_resource_service.py
+```
+
+## Notes
+
+- Tests are isolated, each test starts with a fresh database and cleans up after itself
+- The `conftest.py` in each folder provides fixtures specific to that object
+- The top-level `conftest.py` provides the shared `db` and `client` fixtures used by all tests
