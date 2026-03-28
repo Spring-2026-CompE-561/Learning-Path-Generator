@@ -14,15 +14,9 @@ class ResourceRepository:
         return db.query(Resource).filter(Resource.id == resource_id).first()
 
     @staticmethod
-    def get_all_by_weekly_plan(
-        db: Session, weekly_plan_id: int
-    ) -> list[Resource]:
+    def get_all_by_weekly_plan(db: Session, weekly_plan_id: int) -> list[Resource]:
         """Get all resources for a specific weekly plan."""
-        return (
-            db.query(Resource)
-            .filter(Resource.weeklyplan_id == weekly_plan_id)
-            .all()
-        )
+        return db.query(Resource).filter(Resource.weeklyplan_id == weekly_plan_id).all()
 
     "Create"
 
@@ -49,9 +43,7 @@ class ResourceRepository:
     "Update"
 
     @staticmethod
-    def update_resource(
-        db: Session, db_resource: Resource, updates: dict
-    ) -> Resource:
+    def update_resource(db: Session, db_resource: Resource, updates: dict) -> Resource:
         """Update a resource with the given fields."""
         allowed_fields = {"resource_type", "resource_summary", "url"}
 

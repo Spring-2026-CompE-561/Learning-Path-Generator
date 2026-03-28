@@ -11,7 +11,6 @@ from app.repository.user import UserRepository
 
 from app.core.settings import settings
 
-from fastapi import HTTPException, status
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
@@ -95,14 +94,21 @@ def verify_token(token: str) -> dict:
         )
     else:
         return payload
-    
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+):
     payload = verify_token(token)
     email: str = payload.get("sub")
     if email is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload"
+        )
 
     user = UserRepository.get_by_mail(db, email)
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
     return user
