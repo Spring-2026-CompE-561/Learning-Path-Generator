@@ -27,6 +27,7 @@ def create_resource(
 
 def get_all(
     weekly_plan_id: int, db: Session = Depends(get_db),
+    current_user:  UserModel = Depends(user_service.get_current_user)
 ):
     return resource_service.get_all_by_weekly_plan(db, weekly_plan_id)
 
@@ -36,6 +37,7 @@ def get_all(
 
 def get_using_specificid(
     resource_id: int, db: Session = Depends(get_db),
+    current_user:  UserModel = Depends(user_service.get_current_user)
 ):
     return resource_service.get_by_id(db, resource_id)
 
@@ -45,6 +47,7 @@ def get_using_specificid(
 
 def updating_resource(
     resource_id: int, updates: dict, db: Session = Depends(get_db),
+    current_user:  UserModel = Depends(user_service.get_current_user)
 ):
     return resource_service.update_resource(db, resource_id, updates)
 
@@ -53,6 +56,7 @@ def updating_resource(
 @api_router.delete("/{resource_id}", status_code=status.HTTP_204_NO_CONTENT)
 def del_resource(
     resource_id: int, db: Session = Depends(get_db),
+    current_user:  UserModel = Depends(user_service.get_current_user)
 ):
     resource_service.delete_resource(db, resource_id)
     return None
