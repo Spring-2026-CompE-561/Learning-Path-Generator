@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.services.resource import resource_service
-from app.schemas.resource import Resource as ResourceSchema
+from app.schemas.resource import Resource as ResourceSchema, ResourseCreate
 
 from app.models.user import User as UserModel
 from app.services.user import user_service
@@ -18,15 +18,16 @@ api_router = APIRouter(prefix="/resources", tags=["resources"])
     "/", response_model=ResourceSchema, status_code=status.HTTP_201_CREATED
 )
 def create_resource(
-    weekly_plan_id: int,
-    resource_type: str,
-    resource_summary: str,
-    url: str,
+    payload: ResourseCreate,
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(user_service.get_current_user),
 ):
     return resource_service.create_resource(
-        db, weekly_plan_id, resource_type, resource_summary, url
+        db,
+        payload.weekly_plan_id,
+        payload.resource_type,
+        payload.resource_summary,
+        str(payload.url),
     )
 
 

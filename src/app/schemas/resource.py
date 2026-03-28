@@ -23,6 +23,7 @@ class ResourceUpdate(BaseModel):
 
 
 class ResourseCreate(BaseModel):
+    """To validate when to create Resource"""
     weekly_plan_id: int
     resource_type: Literal["video", "audio", "article", "problems", "course"]
     resource_summary: str = Field(..., max_lenght=300)
