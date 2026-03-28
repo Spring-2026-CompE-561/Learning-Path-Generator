@@ -12,9 +12,7 @@ class WeeklyPlanRepository:
     @staticmethod
     def get_by_id(db: Session, weekly_plan_id: int) -> WeeklyPlan | None:
         """Get a weekly plan by ID."""
-        return (
-            db.query(WeeklyPlan).filter(WeeklyPlan.id == weekly_plan_id).first()
-        )
+        return db.query(WeeklyPlan).filter(WeeklyPlan.id == weekly_plan_id).first()
 
     @staticmethod
     def get_all_by_learning_path(

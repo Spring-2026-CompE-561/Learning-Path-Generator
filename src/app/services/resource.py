@@ -57,9 +57,7 @@ class ResourceService:
                 for this weekly plan.
         """
         # Check for duplicate URL within the same weekly plan
-        existing_resources = self.repository.get_all_by_weekly_plan(
-            db, weekly_plan_id
-        )
+        existing_resources = self.repository.get_all_by_weekly_plan(db, weekly_plan_id)
         for resource in existing_resources:
             if resource.url == url:
                 raise HTTPException(
@@ -72,9 +70,7 @@ class ResourceService:
 
     """Update functions"""
 
-    def update_resource(
-        self, db: Session, resource_id: int, updates: dict
-    ) -> Resource:
+    def update_resource(self, db: Session, resource_id: int, updates: dict) -> Resource:
         """Update a resource.
 
         Arguments:
@@ -89,6 +85,10 @@ class ResourceService:
             HTTPException: If resource not found.
         """
         resource = self.get_by_id(db, resource_id)
+        # extract HttpUrl type as string
+        if "url" in updates and updates["url"] is not None:
+            updates["url"] = str(updates["url"])
+
         return self.repository.update_resource(db, resource, updates)
 
     """Delete functions"""

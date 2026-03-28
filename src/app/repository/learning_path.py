@@ -13,9 +13,7 @@ class LearningPathRepository:
     def get_by_id(db: Session, learning_path_id: int) -> LearningPath | None:
         """Get a learning path by ID."""
         return (
-            db.query(LearningPath)
-            .filter(LearningPath.id == learning_path_id)
-            .first()
+            db.query(LearningPath).filter(LearningPath.id == learning_path_id).first()
         )
 
     @staticmethod
