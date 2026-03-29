@@ -15,7 +15,8 @@ class ResourceBase(BaseModel):
 
     url: HttpUrl
 
-#FIXME: Only need the message or a string for AI to pull resources from somewhere else
+
+# FIXME: Only need the message or a string for AI to pull resources from somewhere else
 class ResourceUpdate(BaseModel):
     """meant to be used if they want to switch the resources given, required to give description as to what they want instead for better resources"""
 

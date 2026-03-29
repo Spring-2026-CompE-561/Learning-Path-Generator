@@ -1,6 +1,7 @@
 import pytest
 from app.models.user import User
 
+
 # learning path needs a user
 @pytest.fixture
 def test_user(db):

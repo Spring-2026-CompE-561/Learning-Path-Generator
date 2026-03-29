@@ -46,7 +46,7 @@ def get_all(
     weekly_plan_id: int,
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(user_service.get_current_user),
-):  
+):
     weekly_plan_service.get_by_id(db, weekly_plan_id)
     return resource_service.get_all_by_weekly_plan(db, weekly_plan_id)
 

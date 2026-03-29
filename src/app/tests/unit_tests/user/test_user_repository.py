@@ -8,6 +8,7 @@ from app.schemas.user import UserDB
 
 # Repository Tests
 
+
 def test_create_user(db: Session):
     # should create a user and return it with an id
     user_db = UserDB(
@@ -53,6 +54,7 @@ def test_get_by_id_exists(db: Session):
     user = UserRepository.get_by_id(db, created.id)
     assert user is not None
     assert user.id == created.id
+
 
 def test_get_by_id_not_found(db: Session):
     # should return None if id does not exist

@@ -2,6 +2,7 @@ import pytest
 from app.models.user import User
 from app.models.learningpath import LearningPath
 
+
 # weekly plan also needs a user -> user -> learning path -> weekly plan
 @pytest.fixture
 def test_user(db):
@@ -15,6 +16,7 @@ def test_user(db):
     db.commit()
     db.refresh(user)
     return user
+
 
 # whats different from here to learning path is the fact that we need to make a learning path for weekly plan too
 @pytest.fixture
