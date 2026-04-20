@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from 'next/navigation';
+import {Button, buttonVariants } from "@/components/ui/button";
 
 //header component
 export function Header() {
