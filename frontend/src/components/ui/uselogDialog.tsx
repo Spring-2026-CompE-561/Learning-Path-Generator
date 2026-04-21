@@ -21,9 +21,9 @@ export function DialogLogin() {
         <DialogTrigger render={<Button variant="outline">Log in</Button>} />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Log in</DialogTitle>
+            <DialogTitle>Login to your account</DialogTitle>
             <DialogDescription>
-              Enter your credentials to access your account.
+                Enter your email below to login to your account
             </DialogDescription>
           </DialogHeader>
             <LoginForm />
