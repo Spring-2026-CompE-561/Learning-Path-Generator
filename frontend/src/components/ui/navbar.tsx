@@ -2,6 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import Link from "next/link";
+import { Menu } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {Button, buttonVariants } from "@/components/ui/button";
 import { NavigationMenuList } from '@base-ui/react';
 import { cn } from '@/lib/utils';
@@ -31,6 +33,29 @@ function DesktopNavbar() {
                     label={item.label} 
                 />
             ))}
+        </nav>
+    );
+}
+
+function MobileNavbar() {
+    return (
+        <nav className="w-full h-fit flex items-center justify-between p-5 bg-black-100">
+            <Sheet>
+                <SheetTrigger asChild>
+                    <Button variant="ghost" className="p-0">
+                        <Menu className="w-6 h-6" />
+                    </Button>
+                </SheetTrigger>
+                <SheetContent>
+                    {NavItems.map((item) => (
+                        <NavbarItem 
+                            key={item.label} 
+                            link={item.link} 
+                            label={item.label} 
+                        />
+                    ))}
+                </SheetContent>
+            </Sheet>
         </nav>
     );
 }
