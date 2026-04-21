@@ -12,34 +12,21 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { LoginForm } from "@/components/ui/useform"
 
 export function DialogLogin() {
   return (
     <Dialog>
       <form>
-        <DialogTrigger render={<Button variant="outline">Open Dialog</Button>} />
+        <DialogTrigger render={<Button variant="outline">Log in</Button>} />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
+            <DialogTitle>Log in</DialogTitle>
             <DialogDescription>
-              Make changes to your profile here. Click save when you&apos;re
-              done.
+              Enter your credentials to access your account.
             </DialogDescription>
           </DialogHeader>
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="name-1">Name</Label>
-              <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
-            </Field>
-            <Field>
-              <Label htmlFor="username-1">Username</Label>
-              <Input id="username-1" name="username" defaultValue="@peduarte" />
-            </Field>
-          </FieldGroup>
-          <DialogFooter>
-            <DialogClose render={<Button variant="outline">Cancel</Button>} />
-            <Button type="submit">Save changes</Button>
-          </DialogFooter>
+            <LoginForm />
         </DialogContent>
       </form>
     </Dialog>

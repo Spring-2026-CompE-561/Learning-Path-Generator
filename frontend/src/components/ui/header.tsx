@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import {Button, buttonVariants } from "@/components/ui/button";
-
+import { DialogLogin } from "@/components/ui/uselogDialog";
 
 
 //list of name of the pages in the app
@@ -53,7 +53,7 @@ export function Header() {
                     </div>
                     <div className="w-fill h-fit flex items-center justify-center">
                        
-
+                        <DialogLogin />
                         <Button variant="ghost">Sign Up</Button>
                     </div>
                 </div>
