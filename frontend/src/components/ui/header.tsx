@@ -65,6 +65,7 @@ export function Header() {
                             <DialogTrigger className="bg-transparent hover:bg-slate-100 px-4 py-2 rounded-md">
                                 <Button variant="ghost">Log In</Button>
                             </DialogTrigger>
+                            <DialogHeader><DialogTitle>Login</DialogTitle></DialogHeader>
                         </Dialog>
 
                         <Button variant="ghost">Sign Up</Button>
