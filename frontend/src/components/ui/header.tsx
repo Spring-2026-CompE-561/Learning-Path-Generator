@@ -2,14 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import {Button, buttonVariants } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+
 
 
 //list of name of the pages in the app
@@ -59,14 +52,7 @@ export function Header() {
                         <h1 className="text-lg"> Learning Path Generator</h1>
                     </div>
                     <div className="w-fill h-fit flex items-center justify-center">
-                        
-                        <Dialog>
-                            {/* The trigger is Log In button*/}
-                            <DialogTrigger className="bg-transparent hover:bg-slate-100 px-4 py-2 rounded-md">
-                                <Button variant="ghost">Log In</Button>
-                            </DialogTrigger>
-                            <DialogHeader><DialogTitle>Login</DialogTitle></DialogHeader>
-                        </Dialog>
+                       
 
                         <Button variant="ghost">Sign Up</Button>
                     </div>
