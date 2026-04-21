@@ -18,47 +18,63 @@ const NavItems = [
 
 export function Navbar() {
     return(
-        <DesktopNavbar />
+        <>
+            <DesktopNavbar />
+            <MobileNavbar/>
+        </>
+        
     )
 }
 
 function DesktopNavbar() {
     return (
-        <nav className="w-full h-fit flex items-center justify-between p-5 bg-black-100">
-            {/* loop through the nav items and create a new navbar item for each link */}
-            {NavItems.map((item) => (
-                <NavbarItem 
-                    key={item.label} 
-                    link={item.link} 
-                    label={item.label} 
+        <div className="hidden border-separate border-b bg-background md:block">
+            <nav className="w-full h-fit flex items-center justify-between p-5 bg-black-100">
+                {/* loop through the nav items and create a new navbar item for each link */}
+                {NavItems.map((item) => (
+                    <NavbarItem 
+                        key={item.label} 
+                        link={item.link} 
+                        label={item.label} 
                 />
-            ))}
-        </nav>
+                ))}
+            </nav>
+        </div>
+
     );
 }
 
 function MobileNavbar() {
-    return (
-        <nav className="w-full h-fit flex items-center justify-between p-5 bg-black-100">
-            <Sheet>
-                <SheetTrigger asChild>
-                    <Button variant="ghost" className="p-0">
-                        <Menu className="w-6 h-6" />
-                    </Button>
-                </SheetTrigger>
-                <SheetContent>
-                    {NavItems.map((item) => (
-                        <NavbarItem 
-                            key={item.label} 
-                            link={item.link} 
-                            label={item.label} 
-                        />
-                    ))}
-                </SheetContent>
-            </Sheet>
-        </nav>
-    );
+  return (
+    <div className="block border-separate bg-background md:hidden">
+      <nav className="w-full h-fit flex items-center justify-between p-5 bg-black-100">
+        <Sheet>
+          {/* Important: Ensure {...props} is applied to the Button */}
+          <SheetTrigger
+            render={(props) => (
+              <Button {...props} variant="ghost" className="p-0">
+                <Menu className="w-6 h-6" />
+              </Button>
+            )}
+          />
+          {/* Add a side so the component knows where to slide in from */}
+          <SheetContent side="left" className="w-[300px]">
+            <div className="flex flex-col gap-4 pt-10">
+              {NavItems.map((item) => (
+                <NavbarItem 
+                  key={item.label} 
+                  link={item.link} 
+                  label={item.label} 
+                />
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </nav>
+    </div>
+  );
 }
+
 
 //connecting the nav items to the navbar
 interface navItemsProps {
