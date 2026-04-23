@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import {Button, buttonVariants } from "@/components/ui/button";
-import { DialogLogin } from "@/components/ui/uselogDialog";
+import { DialogLogin } from "@/components/uselogDialog";
 
 
 //list of name of the pages in the app
