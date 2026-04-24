@@ -20,9 +20,11 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
+  FieldError,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context"
+
 
 
 //form schema for validation using zod
@@ -34,7 +36,7 @@ const formSchema = z.object({
   password: z.string()
             .trim()
             .min(8, "Password must be at least 8 characters")
-            .max(32, "Password must be at most 32 characters"),
+            .max(10, "Password must be at most 10 characters"),
 })
 
 export function LoginForm({className,...props
@@ -78,10 +80,8 @@ export function LoginForm({className,...props
                       placeholder="m@example.com"
                       autoComplete="off"
                     />
-                    {fieldState.error && (
-                      <FieldDescription className="text-destructive">
-                        {fieldState.error.message}
-                      </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
                     )}
                   </Field>
                 )}
@@ -94,18 +94,19 @@ export function LoginForm({className,...props
                   <Field data-invalid={fieldState.invalid}>
                     <div className="flex items-center">
                       <FieldLabel htmlFor="password">Password</FieldLabel>
-                      <a
-                        href="#"
-                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                      >
-                        Forgot your password?
-                      </a>
                     </div>
                     <Input 
                         {...field}
-                        id="password" 
+                        id="password"
+                        aria-invalid={fieldState.invalid} 
                         type="password" 
-                        required />
+                        placeholder="********"
+                        autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+
                   </Field>
                   )}
               />
