@@ -55,10 +55,27 @@ export function LoginForm({className,...props
   //FixMe: Need to call API to validate user credentials and handle login logic. For now, just showing a success toast on form submission.
   //FixMe: Need to change page to dashboard on successfull login
   function onSubmit(data: z.infer<typeof formSchema>){
-    toast.success("Login successful!",
-      {position: "top-center"})
-      form.reset()
-      
+    //FIXME: For testing using the uncomment code
+    //The comment code is for successful login, for real implementation
+    // toast.success("Login successful!",
+    //   {position: "top-center"})
+    //   form.reset()
+
+    //code to display submited input as JSON in the toast
+    toast("You submitted the following values:", {      
+      description: (
+        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
+          <code>{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+      position: "bottom-right",
+      classNames: {
+        content: "flex flex-col gap-2",
+      },
+      style: {
+        "--border-radius": "calc(var(--radius)  + 4px)",
+      } as React.CSSProperties,
+    })
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
