@@ -93,7 +93,7 @@ export function SigninForm({className,...props
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardContent>
-          <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="signin-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               {/*Email Field */}
               <Controller
@@ -115,6 +115,27 @@ export function SigninForm({className,...props
                   </Field>
                 )}
               />
+             {/*User-Name Field */}
+              <Controller
+                name="username"
+                control={form.control}
+                render={({field, fieldState}) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor="username">Username</FieldLabel>
+                    <Input
+                      {...field}
+                      id="username"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="john_doe"
+                      autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+
               {/*Password Field */} 
               <Controller 
                 name="password"
@@ -139,11 +160,32 @@ export function SigninForm({className,...props
                   </Field>
                   )}
               />
+            {/*Confirm Password Field */} 
+              <Controller 
+                name="confirmPassword"
+                control={form.control}
+                render={({field, fieldState}) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="flex items-center">
+                      <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
+                    </div>
+                    <Input 
+                        {...field}
+                        id="confirmPassword"
+                        aria-invalid={fieldState.invalid} 
+                        type="password" 
+                        placeholder="********"
+                        autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+
+                  </Field>
+                  )}
+              />
               <Field>
-                  <Button type="submit">Login</Button>
-                  <FieldDescription className="text-center">
-                    Don&apos;t have an account? <a href="#">Sign up</a>
-                  </FieldDescription>
+                  <Button type="submit">Sign in</Button>
               </Field>
   
             </FieldGroup>

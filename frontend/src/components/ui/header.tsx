@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import {Button, buttonVariants } from "@/components/ui/button";
 import { DialogLogin } from "@/components/uselogDialog";
-
+import { DialogSignin } from "@/components/useSignDialog";
 
 //list of name of the pages in the app
 const nameOfPages = [
@@ -54,7 +54,7 @@ export function Header() {
                     <div className="w-fill h-fit flex items-center justify-center">
                        
                         <DialogLogin />
-                        <Button variant="ghost">Sign Up</Button>
+                        <DialogSignin />
                     </div>
                 </div>
 
