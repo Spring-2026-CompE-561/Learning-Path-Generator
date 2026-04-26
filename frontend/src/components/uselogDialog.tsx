@@ -12,7 +12,7 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LoginForm } from "@/components/useform"
+import { LoginForm } from "@/components/ui/login-form"
 
 export function DialogLogin() {
   return (
