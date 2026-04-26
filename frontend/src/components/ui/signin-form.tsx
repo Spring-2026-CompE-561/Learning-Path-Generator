@@ -33,11 +33,21 @@ const formSchema = z.object({
           .trim()
           .min(1, "Email is required")
           .email("Invalid email address"),
+  username: z.string()
+            .trim()
+            .min(3, "Username must be at least 3 characters")
+            .max(20, "Username must be at most 20 characters"),
   password: z.string()
             .trim()
             .min(8, "Password must be at least 8 characters")
             .max(10, "Password must be at most 10 characters"),
-})
+            confirmPassword: z.string()
+    })
+    /*Making sure password and confirm password match*/
+    .refine((values) => values.password === values.confirmPassword, {
+        message: "Passwords do not match.",
+        path: ["confirmPassword"],
+    })
 
 export function SigninForm({className,...props
 }: React.ComponentProps<"div">) {
@@ -48,7 +58,9 @@ export function SigninForm({className,...props
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      username: "",
       password: "",
+      confirmPassword: "",
     }
   })
 
@@ -62,7 +74,7 @@ export function SigninForm({className,...props
     //   form.reset()
 
     //code to display submited input as JSON in the toast
-    toast("You submitted the following values:", {      
+    toast("Here is your Account Information:", {      
       description: (
         <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
           <code>{JSON.stringify(data, null, 2)}</code>
