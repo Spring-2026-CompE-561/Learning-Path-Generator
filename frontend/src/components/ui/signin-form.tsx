@@ -64,9 +64,30 @@ export function SigninForm({className,...props
     }
   })
 
+  //function to acutally sending user input to backend API
   //FixMe: Need to call API to validate user credentials and handle login logic. For now, just showing a success toast on form submission.
   //FixMe: Need to change page to dashboard on successfull login
-  function onSubmit(data: z.infer<typeof formSchema>){
+  async function onSubmit(data: z.infer<typeof formSchema>){
+    //sending http request
+    const res = await fetch("http://127.0.0.1:8000/users/register", {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+
+    //handling error response
+    if(!res.ok){
+      const errorData = await res.json()
+      toast.error(`Registration failed: ${errorData?.message || "Unknown error"}`, {
+        position: "top-center",
+      })
+      return
+    }
+    
+    
     //FIXME: For testing using the uncomment code
     //The comment code is for successful login, for real implementation
     // toast.success("Login successful!",
@@ -77,7 +98,12 @@ export function SigninForm({className,...props
     toast("Here is your Account Information:", {      
       description: (
         <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-          <code>{JSON.stringify(data, null, 2)}</code>
+          <code>
+            {res.status === 201?
+             "Account created Successfully ! \n You can now log in with your credentials." :
+             "Unexpected response from server. Please try again later."
+            }
+            </code>
         </pre>
       ),
       position: "bottom-right",
@@ -87,7 +113,12 @@ export function SigninForm({className,...props
       style: {
         "--border-radius": "calc(var(--radius)  + 4px)",
       } as React.CSSProperties,
-    })
+    });
+    
+    //waiting backend reponse
+    const returnedData = await res.json();
+    return returnedData;
+
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
