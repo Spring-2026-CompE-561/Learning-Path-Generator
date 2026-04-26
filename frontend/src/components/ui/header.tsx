@@ -2,6 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 import {Button, buttonVariants } from "@/components/ui/button";
+import { DialogLogin } from "@/components/uselogDialog";
+
 
 //list of name of the pages in the app
 const nameOfPages = [
@@ -50,7 +52,8 @@ export function Header() {
                         <h1 className="text-lg"> Learning Path Generator</h1>
                     </div>
                     <div className="w-fill h-fit flex items-center justify-center">
-                        <Button variant="ghost">Log In</Button>
+                       
+                        <DialogLogin />
                         <Button variant="ghost">Sign Up</Button>
                     </div>
                 </div>

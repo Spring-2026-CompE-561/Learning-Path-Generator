@@ -44,6 +44,7 @@ function DesktopNavbar() {
     );
 }
 
+{/*code from professor*/}
 function MobileNavbar() {
   return (
     <div className="block border-separate bg-background md:hidden">
@@ -75,14 +76,14 @@ function MobileNavbar() {
   );
 }
 
-
+{/*code from professor*/}
 //connecting the nav items to the navbar
 interface navItemsProps {
     label: string;
     link: string;
     clickCallBack?: () => void;
 }
-
+{/*code from professor*/}
 //function to create individual navbar items for each page accordingly
 //change css base on current path of the user, to show where they are
 function NavbarItem({ link, label, clickCallBack }: Readonly<navItemsProps>) {

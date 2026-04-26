@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/ui/header";
 import { Navbar } from "@/components/ui/navbar";
+import {Toaster} from "sonner";
 const manrope = Manrope({subsets:['latin'],variable:'--font-sans'});
 
 const geistSans = Geist({
@@ -35,6 +36,7 @@ export default function RootLayout({
         <Header />
         <Navbar />
         {children}
+        <Toaster />
       </body>
     </html>
   );
