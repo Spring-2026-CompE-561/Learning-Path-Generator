@@ -9,14 +9,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Field, FieldGroup } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { SigninForm } from "@/components/ui/signin-form"
+import * as React from "react"
 
 export function DialogSignin() {
+  //variable to monitor state of the dialog
+  const [open, setOpen] = React.useState(false)
   return (
-    <Dialog>
+    //Dialog component are open
+    <Dialog open={open} onOpenChange={setOpen}>
       <form>
         <DialogTrigger render={<Button variant="outline">Sign in</Button>} />
         <DialogContent className="sm:max-w-sm">
