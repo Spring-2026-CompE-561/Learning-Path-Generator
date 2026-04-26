@@ -12,21 +12,21 @@ import {
 import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LoginForm } from "@/components/ui/login-form"
+import { SigninForm } from "@/components/ui/signin-form"
 
-export function DialogLogin() {
+export function DialogSignin() {
   return (
     <Dialog>
       <form>
-        <DialogTrigger render={<Button variant="outline">Log in</Button>} />
+        <DialogTrigger render={<Button variant="outline">Sign in</Button>} />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Login to your account</DialogTitle>
+            <DialogTitle>Create your LearningPath Account</DialogTitle>
             <DialogDescription>
-                Enter your email below to login to your account
+                Enter your email, username, and password to create an account
             </DialogDescription>
           </DialogHeader>
-            <LoginForm />
+            <SigninForm />
         </DialogContent>
       </form>
     </Dialog>
