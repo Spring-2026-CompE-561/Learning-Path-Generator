@@ -13,12 +13,24 @@ import { Field, FieldGroup } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { LoginForm } from "@/components/ui/login-form"
+import * as React from "react"
 
-export function DialogLogin() {
+//props to open login dialog after successful registration
+type DialogLoginProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  //optinal to either open dialog by button or by register success
+  showTrigger?: boolean
+}
+
+
+export function DialogLogin({ open, onOpenChange, showTrigger }: DialogLoginProps) {
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <form>
-        <DialogTrigger render={<Button variant="outline">Log in</Button>} />
+        {showTrigger && (
+          <DialogTrigger render={<Button variant="outline">Log in</Button>} />
+        )}
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Login to your account</DialogTitle>

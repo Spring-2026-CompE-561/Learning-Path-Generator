@@ -14,10 +14,11 @@ import * as React from "react"
 
 export function DialogSignin() {
   //variable to monitor state of the dialog
-  const [open, setOpen] = React.useState(false)
+  const [registerOpen, setRegisterOpen] = React.useState(false)
+  const [loginOpen, setLoginOpen] = React.useState(false)
   return (
     //Dialog component are open
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
       <form>
         <DialogTrigger render={<Button variant="outline">Sign in</Button>} />
         <DialogContent className="sm:max-w-sm">
@@ -28,7 +29,7 @@ export function DialogSignin() {
             </DialogDescription>
           </DialogHeader>
             <SigninForm
-              onRegisterSuccess = {() => {setOpen(false)}} />
+              onRegisterSuccess = {() => {setRegisterOpen(false)}} />
         </DialogContent>
       </form>
     </Dialog>
