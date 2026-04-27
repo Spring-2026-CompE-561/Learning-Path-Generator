@@ -49,10 +49,15 @@ const formSchema = z.object({
         path: ["confirmPassword"],
     })
 
-export function SigninForm({className,...props
-}: React.ComponentProps<"div">) {
-  //function to handle form submission
+//function to be called on successful registration
+type SigninFormProps = React.ComponentProps<"div"> & {
+  onRegisterSuccess?: () => void
+}
 
+export function SigninForm({className, onRegisterSuccess, ...props
+}: SigninFormProps) {
+  //function to handle form submission
+  
   //hook to call
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -87,13 +92,15 @@ export function SigninForm({className,...props
       return
     }
     
+    //waiting backend reponse
+    const returnedData = await res.json();
     
     //FIXME: For testing using the uncomment code
     //The comment code is for successful login, for real implementation
     // toast.success("Login successful!",
     //   {position: "top-center"})
     //   form.reset()
-
+    
     //code to display submited input as JSON in the toast
     toast("Here is your Account Information:", {      
       description: (
@@ -115,8 +122,13 @@ export function SigninForm({className,...props
       } as React.CSSProperties,
     });
     
-    //waiting backend reponse
-    const returnedData = await res.json();
+    //reset form after successful submission
+    //and confirm the resiter is successfull
+    if(res.status === 201){
+      form.reset()
+      onRegisterSuccess?.()
+    }
+
     return returnedData;
 
   }
