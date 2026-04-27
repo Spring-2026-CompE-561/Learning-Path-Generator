@@ -37,7 +37,7 @@ export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLo
                 Enter your email below to login to your account
             </DialogDescription>
           </DialogHeader>
-            <LoginForm />
+            <LoginForm onLoginSuccess = {() => onOpenChange(false)} />
         </DialogContent>
     </Dialog>
   )
