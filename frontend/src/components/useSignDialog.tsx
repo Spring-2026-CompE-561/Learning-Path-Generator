@@ -27,7 +27,8 @@ export function DialogSignin() {
                 Enter your email, username, and password to create an account
             </DialogDescription>
           </DialogHeader>
-            <SigninForm />
+            <SigninForm
+              onRegisterSuccess = {() => {setOpen(false)}} />
         </DialogContent>
       </form>
     </Dialog>
