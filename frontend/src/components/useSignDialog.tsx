@@ -12,14 +12,17 @@ import {
 import { SigninForm } from "@/components/ui/signin-form"
 import * as React from "react"
 
-export function DialogSignin() {
-  //variable to monitor state of the dialog
-  const [registerOpen, setRegisterOpen] = React.useState(false)
-  const [loginOpen, setLoginOpen] = React.useState(false)
+//object for sign in dialog props
+type DialogSigninProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onRegisterSuccess?: () => void
+}
+
+export function DialogSignin({ open, onOpenChange, onRegisterSuccess }: DialogSigninProps) {
   return (
     //Dialog component are open
-    <Dialog open={registerOpen} onOpenChange={setRegisterOpen}>
-      <form>
+    <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogTrigger render={<Button variant="outline">Sign in</Button>} />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
@@ -29,9 +32,8 @@ export function DialogSignin() {
             </DialogDescription>
           </DialogHeader>
             <SigninForm
-              onRegisterSuccess = {() => {setRegisterOpen(false)}} />
+              onRegisterSuccess = {onRegisterSuccess}/>
         </DialogContent>
-      </form>
     </Dialog>
   )
 }

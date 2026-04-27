@@ -27,7 +27,6 @@ type DialogLoginProps = {
 export function DialogLogin({ open, onOpenChange, showTrigger }: DialogLoginProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <form>
         {showTrigger && (
           <DialogTrigger render={<Button variant="outline">Log in</Button>} />
         )}
@@ -40,7 +39,6 @@ export function DialogLogin({ open, onOpenChange, showTrigger }: DialogLoginProp
           </DialogHeader>
             <LoginForm />
         </DialogContent>
-      </form>
     </Dialog>
   )
 }
