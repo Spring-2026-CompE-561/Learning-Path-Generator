@@ -24,7 +24,7 @@ type DialogLoginProps = {
 }
 
 
-export function DialogLogin({ open, onOpenChange, showTrigger }: DialogLoginProps) {
+export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLoginProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
         {showTrigger && (

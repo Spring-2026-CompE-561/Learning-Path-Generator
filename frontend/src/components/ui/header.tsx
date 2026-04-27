@@ -56,7 +56,7 @@ export function Header() {
                         </svg>
                         <h1 className="text-lg"> Learning Path Generator</h1>
                     </div>
-                    <div className="w-fill h-fit flex items-center justify-center">
+                    <div className="w-fill h-fit flex items-center justify-center gap-4">
                        
                         <DialogLogin 
                             open={loginOpen}
