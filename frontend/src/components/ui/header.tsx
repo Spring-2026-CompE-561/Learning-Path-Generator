@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import {Button, buttonVariants } from "@/components/ui/button";
 import { DialogLogin } from "@/components/uselogDialog";
 import { DialogSignin } from "@/components/useSignDialog";
+import * as React from "react";
 
 //list of name of the pages in the app
 const nameOfPages = [
@@ -39,6 +40,10 @@ export function Header() {
         pageTitle = 'Learning Path Name';
     }
 
+    //variable to monitor state of the dialog
+    const [registerOpen, setRegisterOpen] = React.useState(false)
+    const [loginOpen, setLoginOpen] = React.useState(false)
+
     //special case for landing page
     if (pathname === '/'){
         return (
@@ -51,10 +56,20 @@ export function Header() {
                         </svg>
                         <h1 className="text-lg"> Learning Path Generator</h1>
                     </div>
-                    <div className="w-fill h-fit flex items-center justify-center">
+                    <div className="w-fill h-fit flex items-center justify-center gap-4">
                        
-                        <DialogLogin />
-                        <DialogSignin />
+                        <DialogLogin 
+                            open={loginOpen}
+                            onOpenChange={setLoginOpen}
+                        />
+                        <DialogSignin
+                            open={registerOpen}
+                            onOpenChange={setRegisterOpen}
+                            onRegisterSuccess={() => {
+                                setRegisterOpen(false)
+                                setLoginOpen(true)
+                            }} 
+                        />
                     </div>
                 </div>
 

@@ -9,15 +9,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Field, FieldGroup } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { SigninForm } from "@/components/ui/signin-form"
+import * as React from "react"
 
-export function DialogSignin() {
+//object for sign in dialog props
+type DialogSigninProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onRegisterSuccess?: () => void
+}
+
+export function DialogSignin({ open, onOpenChange, onRegisterSuccess }: DialogSigninProps) {
   return (
-    <Dialog>
-      <form>
+    //Dialog component are open
+    <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogTrigger render={<Button variant="outline">Sign in</Button>} />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
@@ -26,9 +31,9 @@ export function DialogSignin() {
                 Enter your email, username, and password to create an account
             </DialogDescription>
           </DialogHeader>
-            <SigninForm />
+            <SigninForm
+              onRegisterSuccess = {onRegisterSuccess}/>
         </DialogContent>
-      </form>
     </Dialog>
   )
 }
