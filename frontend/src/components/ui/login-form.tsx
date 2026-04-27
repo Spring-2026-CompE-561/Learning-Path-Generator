@@ -23,7 +23,9 @@ import {
   FieldError,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context"
+
+//
+import { useRouter } from "next/navigation"
 
 
 
@@ -39,8 +41,18 @@ const formSchema = z.object({
             .max(10, "Password must be at most 10 characters"),
 })
 
-export function LoginForm({className,...props
-}: React.ComponentProps<"div">) {
+// used to tell the dialog to close after login
+type LoginFormProps = React.ComponentProps<"div"> & {
+  onLoginSuccess?: () => void
+}
+
+export function LoginForm({className, onLoginSuccess, ...props
+}: LoginFormProps) {
+
+  // used to redirect to dashboard after logging in 
+  const router = useRouter()
+
+
   //function to handle form submission
 
   //hook to call
@@ -54,28 +66,58 @@ export function LoginForm({className,...props
 
   //FixMe: Need to call API to validate user credentials and handle login logic. For now, just showing a success toast on form submission.
   //FixMe: Need to change page to dashboard on successfull login
-  function onSubmit(data: z.infer<typeof formSchema>){
+
+  // sends login req to backend and handles response
+  async function onSubmit(data: z.infer<typeof formSchema>){
     //FIXME: For testing using the uncomment code
     //The comment code is for successful login, for real implementation
     // toast.success("Login successful!",
     //   {position: "top-center"})
     //   form.reset()
 
-    //code to display submited input as JSON in the toast
-    toast("You submitted the following values:", {      
-      description: (
-        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-          <code>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-      position: "bottom-right",
-      classNames: {
-        content: "flex flex-col gap-2",
+    // sends email and pass to backend login endpoint
+    const res = await fetch("http://127.0.0.1:8000/users/login", {
+      method: "POST",
+      headers: {
+        // send back json
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      style: {
-        "--border-radius": "calc(var(--radius)  + 4px)",
-      } as React.CSSProperties,
+
+      // converts data into string
+      body: new URLSearchParams({
+        username: data.email,
+        password: data.password,
+      }).toString(),
     })
+    
+    // wrong password or username not found = error
+    // true for success status codes but false for error status codes (duh)
+    if(!res.ok) {
+
+      // read error details
+      const errorData = await res.json()
+
+      // tell user what went wrong
+      toast.error("Login failed: " + (errorData?.detail || "Unknown error"))
+      return
+    }
+
+    // JWt token so other pages dont have to recheck and they knwo your logged in 
+    const returnedData = await res.json()
+
+    // saves token so other pages can check for it later when doing things
+    localStorage.setItem("access_token", returnedData.access_token)
+
+    // login works, notification for it
+    toast.success("Login successful!", {
+      position: "top-center",
+    })
+
+    // clear fields close the dialog then go to dashboard
+    form.reset()
+    onLoginSuccess?.()
+    router.push("/dashboard")
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
