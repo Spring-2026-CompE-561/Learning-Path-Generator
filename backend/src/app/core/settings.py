@@ -24,9 +24,9 @@ class Settings(BaseSettings):
         default=10,
         description="Access token expiration time in minutes",
     )
-    # FIXME: change datapase later on if needed
+ 
     database_url: str = Field(
-        default="sqlite:///./learning_paths.db",
+        default="postgresql+psycopg://postgres:password@localhost:5432/learning_paths",
         description="The database URL",
     )
 
