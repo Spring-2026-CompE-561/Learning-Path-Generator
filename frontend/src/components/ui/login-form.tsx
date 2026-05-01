@@ -69,7 +69,7 @@ export function LoginForm({className, onLoginSuccess, ...props
 
   // sends login req to backend and handles response
   async function onSubmit(data: z.infer<typeof formSchema>){
-    //FIXME: For testing using the uncomment code
+    //FIXME: For testing using the toast to show submitted data
     //The comment code is for successful login, for real implementation
     // toast.success("Login successful!",
     //   {position: "top-center"})
@@ -109,9 +109,20 @@ export function LoginForm({className, onLoginSuccess, ...props
     // saves token so other pages can check for it later when doing things
     localStorage.setItem("access_token", returnedData.access_token)
 
-    // login works, notification for it
-    toast.success("Login successful!", {
-      position: "top-center",
+    //code to display submited input as JSON in the toast
+    toast("You submitted the following values:", {      
+      description: (
+        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
+          <code>{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+      position: "bottom-right",
+      classNames: {
+        content: "flex flex-col gap-2",
+      },
+      style: {
+        "--border-radius": "calc(var(--radius)  + 4px)",
+      } as React.CSSProperties,
     })
 
     // clear fields close the dialog then go to dashboard

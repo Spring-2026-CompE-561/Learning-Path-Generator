@@ -91,3 +91,10 @@ async def Logout(
 ) -> None:
     user_service.revoke_tokens(db, current_user)
     return None
+
+#endpoint to return the current user's information
+@api_router.get("/me", response_model=UserSchema)
+async def get_me(
+    current_user: Annotated[UserModel, Depends(user_service.get_current_user)],
+)-> UserSchema:
+    return current_user
