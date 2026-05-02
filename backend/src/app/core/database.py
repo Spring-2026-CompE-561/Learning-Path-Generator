@@ -31,3 +31,9 @@ def get_db() -> Generator[Session]:
         yield db
     finally:
         db.close()
+
+#Function to create the database
+#putting it here since it will cause problem if it's in main
+#for pytest, where app.main hit main database too early
+def create_db_tb() -> None:
+    Base.metadata.create_all(bind=engine)
