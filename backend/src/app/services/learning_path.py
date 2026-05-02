@@ -34,7 +34,7 @@ class LearningPathService:
     def create_learning_path(
         self, db: Session, learning_path_data: LearningPathCreate, user_id: int
     ) -> LearningPath:
-        """Create a new learning path for a user.
+        """Create a new learning path for a user using AI.
 
         Arguments:
             db: Database session
@@ -42,12 +42,46 @@ class LearningPathService:
             user_id: ID of the user creating the learning path
 
         Returns:
-            LearningPath: The created learning path.
+            learning_path: The created learning path.
 
         Raises:
             HTTPException: If creation fails.
         """
-        return self.repository.create_learning_path(db, learning_path_data, user_id)
+
+        # create learning path so an ID is given
+        learning_path = self.repository.create_learning_path(db, learning_path_data, user_id)
+
+        
+        from app.services.ai import generatingWeeklyPlans
+        from app.repository.weekly_plan import WeeklyPlanRepository
+
+        # generates the plan u want with resources now
+        new_plan = generatingWeeklyPlans(topic = learning_path.topic, proficency = learning_path.proficency, weeks = learning_path.weeks, learning_path_id= learning_path.id)
+
+
+        from app.repository.resource import ResourceRepository
+
+        # saving weekly plan + resources associated with it into the db
+        weekly_plan_repo = WeeklyPlanRepository()
+        resource_repo = ResourceRepository()
+
+        for item in new_plan:
+            # save weekly plan so you have an id for it 
+            savedPlan = weekly_plan_repo.create_weekly_plan(db, item["plan"])
+
+            # for each resource in the plan
+            for resource in item["resources"]:
+                # save the resources
+                try:
+                    resource_repo.create_resource(db = db, weekly_plan_id= savedPlan.id, resource_type= resource["resource_type"], resource_summary= resource["resource_summary"], url = resource["url"])
+
+                except Exception as e:
+                    # if the resource is bad, skip the resource
+                    print(f"Failed to save resource: {e}")
+                    continue
+
+        return learning_path
+    
 
     """Update functions"""
 
