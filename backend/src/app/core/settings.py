@@ -1,7 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 from pydantic import Field
-
 #Resolve path for .env file
 BASE_DIR = Path(__file__).resolve().parents[4]
 ENV_FILE = BASE_DIR / ".env"
@@ -26,7 +25,8 @@ class Settings(BaseSettings):
     )
  
     database_url: str = Field(
-        default="postgresql+psycopg://postgres:password@localhost:5432/learning_paths",
+        default="sqlite:///./learning_paths.db",
+        alias="DATABASE_URL",
         description="The database URL",
     )
 
@@ -35,7 +35,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=str(ENV_FILE),
         env_file_encoding="utf-8",
+        populate_by_name=True,
     )
 
-
 settings = Settings()
+print("ENV FILE:", ENV_FILE)
+print("ENV EXISTS:", ENV_FILE.exists())

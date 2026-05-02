@@ -16,7 +16,8 @@ from app.routes.resource import api_router as resource_router
 
 # create database tables
 # if the tables do not exist, create them
-Base.metadata.create_all(bind=engine)
+# bad for test, maybe need to do this later
+# Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI(
@@ -56,3 +57,8 @@ async def log_requests(request: Request, call_next):
         f"{request.method} {request.url.path} - {response.status_code} ({duration:.2f}s)"
     )
     return response
+
+print("DB URL:", settings.database_url)
+import os
+print("RAW ENV:", os.getenv("DATABASE_URL"))
+print("SETTINGS DB:", settings.database_url)
