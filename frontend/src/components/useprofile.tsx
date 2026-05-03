@@ -7,6 +7,8 @@ import { toast } from "sonner"
 import * as z from "zod"
 
 import { cn } from "@/lib/utils"
+import  UserProfile  from "@/components/ui/profileIcon"
+
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -23,7 +25,6 @@ import {
     FieldError,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context"
 
 
 
@@ -136,8 +137,14 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                         </CardDescription>
                     </CardHeader>
                 </div>
-
                 <CardContent>
+                    <div className="flex flex-row w-full gap-8 justify-start items-center">
+                        <UserProfile className="w-[10%] h-[10%]"/>
+                        <div>
+                            <Button className="text-2xl">Change Avatar</Button>
+                            <p>JPG, GIF, or PNG</p>
+                        </div>
+                    </div>
                     <form id="signin-form" onSubmit={form.handleSubmit(onSubmit)}>
                         <FieldGroup>
                             {/*Email Field */}
