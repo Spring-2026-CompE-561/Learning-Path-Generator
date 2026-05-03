@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import * as z from "zod"
 
 import { cn } from "@/lib/utils"
-import  UserProfile  from "@/components/ui/profileIcon"
+import UserProfile from "@/components/ui/profileIcon"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -137,91 +137,94 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                         </CardDescription>
                     </CardHeader>
                 </div>
-                <CardContent>
+                <CardContent className="flex flex-col gap-5">
                     <div className="flex flex-row w-full gap-8 justify-start items-center">
-                        <UserProfile className="w-[10%] h-[10%]"/>
+                        <UserProfile className="w-[10%] h-[10%]" />
                         <div>
-                            <Button className="text-2xl">Change Avatar</Button>
+                            <Button className="text-lg">Change Avatar</Button>
                             <p>JPG, GIF, or PNG</p>
                         </div>
                     </div>
                     <form id="signin-form" onSubmit={form.handleSubmit(onSubmit)}>
-                        <FieldGroup className="flex-row">
-                            {/*Email Field */}
-                            <Controller
-                                name="email"
-                                control={form.control}
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel htmlFor="email">Email</FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id="email"
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="m@example.com"
-                                            autoComplete="off"
-                                        />
-                                        {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                        )}
-                                    </Field>
-                                )}
-                            />
-                            {/*User-Name Field */}
-                            <Controller
-                                name="username"
-                                control={form.control}
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                        <FieldLabel htmlFor="username">Username</FieldLabel>
-                                        <Input
-                                            {...field}
-                                            id="username"
-                                            aria-invalid={fieldState.invalid}
-                                            placeholder="john_doe"
-                                            autoComplete="off"
-                                        />
-                                        {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                        )}
-                                    </Field>
-                                )}
-                            />
+                        <div className="gap-5 flex flex-col">
+                            <FieldGroup className="flex-row">
+                                {/*Email Field */}
+                                <Controller
+                                    name="email"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                            <FieldLabel htmlFor="email">Email</FieldLabel>
+                                            <Input
+                                                {...field}
+                                                id="email"
+                                                aria-invalid={fieldState.invalid}
+                                                placeholder="m@example.com"
+                                                autoComplete="off"
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError errors={[fieldState.error]} />
+                                            )}
+                                        </Field>
+                                    )}
+                                />
+                                {/*User-Name Field */}
+                                <Controller
+                                    name="username"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                            <FieldLabel htmlFor="username">Username</FieldLabel>
+                                            <Input
+                                                {...field}
+                                                id="username"
+                                                aria-invalid={fieldState.invalid}
+                                                placeholder="john_doe"
+                                                autoComplete="off"
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError errors={[fieldState.error]} />
+                                            )}
+                                        </Field>
+                                    )}
+                                />
 
-                            {/*Password Field */}
-                            <Controller
-                                name="password"
-                                control={form.control}
-                                render={({ field, fieldState }) => (
-                                    <Field data-invalid={fieldState.invalid}>
-                                        <div className="flex items-center">
-                                            <FieldLabel htmlFor="password">Password</FieldLabel>
-                                        </div>
-                                        <Input
-                                            {...field}
-                                            id="password"
-                                            aria-invalid={fieldState.invalid}
-                                            type="password"
-                                            placeholder="********"
-                                            autoComplete="off"
-                                        />
-                                        {fieldState.invalid && (
-                                            <FieldError errors={[fieldState.error]} />
-                                        )}
+                                {/*Password Field */}
+                                <Controller
+                                    name="password"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                            <div className="flex items-center">
+                                                <FieldLabel htmlFor="password">Password</FieldLabel>
+                                            </div>
+                                            <Input
+                                                {...field}
+                                                id="password"
+                                                aria-invalid={fieldState.invalid}
+                                                type="password"
+                                                placeholder="********"
+                                                autoComplete="off"
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError errors={[fieldState.error]} />
+                                            )}
 
-                                    </Field>
-                                )}
-                            />
-                        </FieldGroup>
-                        <FieldGroup className="flex-row">
-                            <Field>
-                                <Button type="submit">Save</Button>
-                            </Field>
+                                        </Field>
+                                    )}
+                                />
+                            </FieldGroup>
+                            <FieldGroup className="flex-row">
+                                <Field>
+                                    <Button type="submit">Save</Button>
+                                </Field>
 
-                            <Field>
-                                <Button type="submit">Log Out</Button>
-                            </Field>
-                        </FieldGroup>
+                                <Field>
+                                    <Button type="submit">Log Out</Button>
+                                </Field>
+                            </FieldGroup>
+                        </div>
+
                     </form>
                 </CardContent>
             </Card>
