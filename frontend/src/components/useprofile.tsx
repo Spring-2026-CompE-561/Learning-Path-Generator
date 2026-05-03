@@ -146,7 +146,7 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                         </div>
                     </div>
                     <form id="signin-form" onSubmit={form.handleSubmit(onSubmit)}>
-                        <FieldGroup>
+                        <FieldGroup className="flex-row">
                             {/*Email Field */}
                             <Controller
                                 name="email"
@@ -212,10 +212,15 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                                     </Field>
                                 )}
                             />
+                        </FieldGroup>
+                        <FieldGroup className="flex-row">
                             <Field>
                                 <Button type="submit">Save</Button>
                             </Field>
 
+                            <Field>
+                                <Button type="submit">Log Out</Button>
+                            </Field>
                         </FieldGroup>
                     </form>
                 </CardContent>
