@@ -28,7 +28,7 @@ export function Navbar() {
 
 function DesktopNavbar() {
     return (
-        <div className="hidden border-separate border-b bg-background md:block">
+        <div className="hidden border-separate border-b bg-background md:block bg-primary text-foreground">
             <nav className="w-full h-fit flex items-center justify-between p-5 bg-black-100">
                 {/* loop through the nav items and create a new navbar item for each link */}
                 {NavItems.map((item) => (
