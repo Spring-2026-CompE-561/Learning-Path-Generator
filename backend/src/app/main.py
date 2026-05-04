@@ -36,8 +36,10 @@ app.include_router(resource_router)
 # configure CORRS middleware to allow requests from any origin
 app.add_middleware(
     CORSMiddleware,
-    # FIXME: fake front-end port for now
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
