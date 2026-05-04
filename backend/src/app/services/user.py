@@ -39,9 +39,13 @@ class UserService:
             )
         return user_id
 
-    def is_user_exists(self, db: Session, email: str) -> bool:
+    def is_email_taken(self, db: Session, email: str) -> bool:
         """Check if a user with the given email already exists in the database."""
         return self.repository.get_by_mail(db, email) is not None
+
+    def is_username_taken(self, db: Session, username: str) -> bool:
+        """Check if a user with the given username already exists in the database."""
+        return self.repository.get_by_username(db, username) is not None
 
     def get_current_user(
         self,
@@ -97,12 +101,15 @@ class UserService:
             HTTPException: If the username or email is already exists.
         """
 
-        # Check if user already exists with the same username or email
-        existing_user = self.is_user_exists(db, user_db.email)
-        if existing_user:
+        if self.is_email_taken(db, user_db.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered",
+            )
+        if self.is_username_taken(db, user_db.username):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already taken",
             )
 
         # Hash the password before creating the user

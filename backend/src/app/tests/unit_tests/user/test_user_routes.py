@@ -2,9 +2,7 @@
 
 from fastapi.testclient import TestClient
 
-
 # Route Tests
-
 
 def test_register_user_success(client: TestClient):
     # hitting POST /users/register with valid data should return 201
@@ -45,6 +43,29 @@ def test_register_duplicate_email(client: TestClient):
     )
     assert response.status_code == 400
     assert response.json()["detail"] == "Email already registered"
+
+
+def test_register_duplicate_username(client: TestClient):
+    # second registration with the same username should return 400
+    client.post(
+        "/users/register",
+        json={
+            "username": "testuser",
+            "email": "first@example.com",
+            "password": "securepassword123",
+        },
+    )
+
+    response = client.post(
+        "/users/register",
+        json={
+            "username": "testuser",
+            "email": "second@example.com",
+            "password": "differentpassword",
+        },
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Username already taken"
 
 
 def test_register_missing_fields(client: TestClient):
