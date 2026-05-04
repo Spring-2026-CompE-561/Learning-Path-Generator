@@ -32,17 +32,21 @@ import { Input } from "@/components/ui/input"
 const formSchema = z.object({
     email: z.string()
         .trim()
-        .min(1, "Email is required")
-        .email("Invalid email address"),
+        .email("Invalid email address")
+        .optional()
+        .or(z.literal("")),
     username: z.string()
         .trim()
         .min(3, "Username must be at least 3 characters")
-        .max(20, "Username must be at most 20 characters"),
+        .max(20, "Username must be at most 20 characters")
+        .optional()
+        .or(z.literal("")),
     password: z.string()
         .trim()
         .min(8, "Password must be at least 8 characters")
-        .max(10, "Password must be at most 10 characters"),
-    confirmPassword: z.string()
+        .max(10, "Password must be at most 10 characters")
+        .optional()
+        .or(z.literal("")),
 })
 //function to be called on successful registration
 type SigninFormProps = React.ComponentProps<"div"> & {
@@ -121,7 +125,6 @@ export function AccountForm({ className, onRegisterSuccess, ...props
             email: "",
             username: "",
             password: "",
-            confirmPassword: "",
         }
     })
 
