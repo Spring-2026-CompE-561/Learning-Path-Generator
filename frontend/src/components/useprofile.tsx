@@ -81,7 +81,7 @@ async function handleDeleteAccount() {
     })
 
 
-    localStorage.removeItem("token")
+    localStorage.removeItem("access_token")
     window.location.href = "/"
 }
 
@@ -109,7 +109,7 @@ async function handleLogOut() {
     })
 
 
-    localStorage.removeItem("token")
+    localStorage.removeItem("access_token")
     window.location.href = "/"
 }
 
@@ -149,27 +149,54 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                 return
             }
             const user = await res.json()
-            form.setValue("email", user.email)
-            form.setValue("username", user.username)
+            
+            //continously showing user username and email
+            form.reset({
+                email: user.email,
+                username: user.username,
+                password:"********"
+            })
         }
         getCurrentUser()
-    }), [form]
+    }, [form])
 
+
+    //submitting update user information
     async function onSubmit(data: z.infer<typeof formSchema>) {
+        const token = localStorage.getItem("access_token")
+        
+        //filtering input data only sending chaning field
+        //checking if the field being modify or not
+        //depend on that sending input or not
+        const dirtyFields = form.formState.dirtyFields
+        const filteredData = Object.fromEntries(
+            Object.entries(data).filter(([key, value]) => {
+                const fieldState = form.getFieldState(key as keyof z.infer<typeof formSchema>)
+                return fieldState.isDirty && value !==""
+            })
+        )
+
+        //if no key being modify then return error
+        if(Object.keys(filteredData).length === 0){
+            toast.error("no changes to save")
+            return
+        }
+
         //sending http request
-        const res = await fetch("http://127.0.0.1:8000/users/register", {
-            method: "POST",
+        const res = await fetch("http://127.0.0.1:8000/users/update", {
+            method: "PUT",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify(data),
+            body: JSON.stringify(filteredData),
         })
 
         //handling error response
         if (!res.ok) {
             const errorData = await res.json()
-            toast.error(`Registration failed: ${errorData?.message || "Unknown error"}`, {
+            toast.error(`Updationg failed: ${errorData?.message || "Unknown error"}`, {
                 position: "top-center",
             })
             return
@@ -189,8 +216,8 @@ export function AccountForm({ className, onRegisterSuccess, ...props
             description: (
                 <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
                     <code>
-                        {res.status === 201 ?
-                            "Account created Successfully ! \n You can now log in with your credentials." :
+                        {res.status === 200 ?
+                            "Account Updated Successfully!" :
                             "Unexpected response from server. Please try again later."
                         }
                     </code>
@@ -204,16 +231,7 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                 "--border-radius": "calc(var(--radius)  + 4px)",
             } as React.CSSProperties,
         });
-
-        //reset form after successful submission
-        //and confirm the resiter is successfull
-        if (res.status === 201) {
-            form.reset()
-            onRegisterSuccess?.()
-        }
-
         return returnedData;
-
     }
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
