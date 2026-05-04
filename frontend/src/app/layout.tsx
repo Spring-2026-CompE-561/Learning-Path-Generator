@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { Header } from "@/components/ui/header";
 import { Navbar } from "@/components/ui/navbar";
 import {Toaster} from "sonner";
+import { Footer } from "@/components/ui/footer";
+
 const manrope = Manrope({subsets:['latin'],variable:'--font-sans'});
 
 const geistSans = Geist({
@@ -32,10 +34,13 @@ export default function RootLayout({
       lang="en"
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", manrope.variable)}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-screen flex flex-col">
         <Header />
         <Navbar />
-        {children}
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer />
         <Toaster />
       </body>
     </html>
