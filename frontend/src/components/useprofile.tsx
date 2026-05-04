@@ -49,6 +49,39 @@ type SigninFormProps = React.ComponentProps<"div"> & {
     onRegisterSuccess?: () => void
 }
 
+//function to delete account
+async function handleDeleteAccount(){
+    const confirmed = window.confirm(
+        "Are you sure you want to delete your account? this action cannot be undone"
+    )
+    if(!confirmed) return
+
+    const token = localStorage.getItem("access_token")
+
+    const res = await fetch("http://127.0.0.1:8000/users/me",{
+        method: "DELETE",
+        headers:{
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+        }
+    })
+
+    if(!res.ok){
+        toast.error("Failed to delete Account",{
+            position:"top-center"
+        })
+        return
+    }
+    toast.success("Account deleted successfully",{
+        position: "top-center",
+    })
+    
+
+    localStorage.removeItem("token")
+    window.location.href = "/"
+}
+
+
 export function AccountForm({ className, onRegisterSuccess, ...props
 }: SigninFormProps) {
     //function to handle form submission
@@ -220,7 +253,11 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                                 </Field>
 
                                 <Field>
-                                    <Button type="submit">Log Out</Button>
+                                    <Button type="button">Log Out</Button>
+                                </Field>
+
+                                <Field>
+                                    <Button type="button" onClick={handleDeleteAccount}>Delete Account</Button>
                                 </Field>
                             </FieldGroup>
                         </div>
