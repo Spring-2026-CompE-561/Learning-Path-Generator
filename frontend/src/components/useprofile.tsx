@@ -81,6 +81,34 @@ async function handleDeleteAccount(){
     window.location.href = "/"
 }
 
+//function to log out account
+async function handleLogOut(){
+
+    const token = localStorage.getItem("access_token")
+
+    const res = await fetch("http://127.0.0.1:8000/users/logout",{
+        method: "POST",
+        headers:{
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+        }
+    })
+
+    if(!res.ok){
+        toast.error("Failed to Log Out",{
+            position:"top-center"
+        })
+        return
+    }
+    toast.success("Log Out successfully",{
+        position: "top-center",
+    })
+    
+
+    localStorage.removeItem("token")
+    window.location.href = "/"
+}
+
 
 export function AccountForm({ className, onRegisterSuccess, ...props
 }: SigninFormProps) {
@@ -253,7 +281,7 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                                 </Field>
 
                                 <Field>
-                                    <Button type="button">Log Out</Button>
+                                    <Button type="button" onClick={handleLogOut}>Log Out</Button>
                                 </Field>
 
                                 <Field>
