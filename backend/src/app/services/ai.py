@@ -3,14 +3,12 @@
 import json
 import os
 from groq import Groq
-from dotenv import load_dotenv
-
-load_dotenv()
+from app.core.settings import settings
 
 from app.schemas.weeklyPlan import WeeklyPlanCreate
 
 # connecting to the GROQ servers and making a client through the api key in .env
-connection = Groq(api_key = os.environ.get("GROQ_API_KEY"))
+connection = Groq(api_key=settings.groq_api_key)
 
 # used to generate the weekly plans
 # topic -> string = what user wants to learn
