@@ -29,6 +29,11 @@ class Settings(BaseSettings):
         alias="DATABASE_URL",
         description="The database URL",
     )
+    groq_api_key: str = Field(
+        default="",
+        alias="GROQ_API_KEY",
+        description="API key to use groq (AI)"
+    )
 
 
     #Adding config for .env file
