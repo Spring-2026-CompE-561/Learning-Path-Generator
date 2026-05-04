@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from 'next/navigation';
-import {Button, buttonVariants } from "@/components/ui/button";
 import { DialogLogin } from "@/components/uselogDialog";
 import { DialogSignin } from "@/components/useSignDialog";
 import * as React from "react";
