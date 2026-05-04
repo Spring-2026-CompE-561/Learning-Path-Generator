@@ -50,60 +50,60 @@ type SigninFormProps = React.ComponentProps<"div"> & {
 }
 
 //function to delete account
-async function handleDeleteAccount(){
+async function handleDeleteAccount() {
     const confirmed = window.confirm(
         "Are you sure you want to delete your account? this action cannot be undone"
     )
-    if(!confirmed) return
+    if (!confirmed) return
 
     const token = localStorage.getItem("access_token")
 
-    const res = await fetch("http://127.0.0.1:8000/users/me",{
+    const res = await fetch("http://127.0.0.1:8000/users/me", {
         method: "DELETE",
-        headers:{
+        headers: {
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
         }
     })
 
-    if(!res.ok){
-        toast.error("Failed to delete Account",{
-            position:"top-center"
+    if (!res.ok) {
+        toast.error("Failed to delete Account", {
+            position: "top-center"
         })
         return
     }
-    toast.success("Account deleted successfully",{
+    toast.success("Account deleted successfully", {
         position: "top-center",
     })
-    
+
 
     localStorage.removeItem("token")
     window.location.href = "/"
 }
 
 //function to log out account
-async function handleLogOut(){
+async function handleLogOut() {
 
     const token = localStorage.getItem("access_token")
 
-    const res = await fetch("http://127.0.0.1:8000/users/logout",{
+    const res = await fetch("http://127.0.0.1:8000/users/logout", {
         method: "POST",
-        headers:{
+        headers: {
             Accept: "application/json",
             Authorization: `Bearer ${token}`,
         }
     })
 
-    if(!res.ok){
-        toast.error("Failed to Log Out",{
-            position:"top-center"
+    if (!res.ok) {
+        toast.error("Failed to Log Out", {
+            position: "top-center"
         })
         return
     }
-    toast.success("Log Out successfully",{
+    toast.success("Log Out successfully", {
         position: "top-center",
     })
-    
+
 
     localStorage.removeItem("token")
     window.location.href = "/"
@@ -124,6 +124,33 @@ export function AccountForm({ className, onRegisterSuccess, ...props
             confirmPassword: "",
         }
     })
+
+    //function to collect user information
+    React.useEffect(() => {
+        async function getCurrentUser() {
+            const token = localStorage.getItem("access_token")
+            if (!token) {
+                toast.error("no login token found")
+                return
+            }
+            const res = await fetch("http://127.0.0.1:8000/users/me", {
+                method: "GET",
+                headers: {
+                    Accept: "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+
+            if (!res.ok) {
+                toast.error("Failed to load account info")
+                return
+            }
+            const user = await res.json()
+            form.setValue("email", user.email)
+            form.setValue("username", user.username)
+        }
+        getCurrentUser()
+    }), [form]
 
     async function onSubmit(data: z.infer<typeof formSchema>) {
         //sending http request
