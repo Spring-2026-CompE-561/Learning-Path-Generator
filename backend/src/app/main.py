@@ -8,15 +8,11 @@ import app.models
 import logging
 import time
 
-
+from app.core.database import create_db_tb
 from app.routes.user import api_router as user_router
 from app.routes.learning_path import api_router as learning_path_router
 from app.routes.weekly_plan import api_router as weekly_plan_router
 from app.routes.resource import api_router as resource_router
-
-# create database tables
-# if the tables do not exist, create them
-Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI(
@@ -24,6 +20,12 @@ app = FastAPI(
     description="An API for generating a schedule for personal learning",
     version=settings.app_version,
 )
+
+
+#create database when real app start up
+@app.on_event("startup")
+def on_startup() -> None:
+    create_db_tb()
 
 # adding the user router to the main app
 app.include_router(user_router)
@@ -56,3 +58,4 @@ async def log_requests(request: Request, call_next):
         f"{request.method} {request.url.path} - {response.status_code} ({duration:.2f}s)"
     )
     return response
+

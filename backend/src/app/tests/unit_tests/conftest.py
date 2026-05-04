@@ -9,9 +9,9 @@ from app.core.database import Base, get_db
 """ Shared fixtures for all tests in this folder. Pytest automatically loads this file 
 so db and client are available in every test file without importing them. """
 
-TEST_DATABASE_URL = "sqlite:///./test.db"
+TEST_DATABASE_URL = "postgresql+psycopg://learning_app:12345678@localhost:5432/learning_paths_test"
 
-engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(TEST_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
