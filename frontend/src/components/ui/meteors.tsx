@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import React from "react";
 
+//modification code from Aceternity UI
 export const Meteors = ({
   number = 40,
   className,

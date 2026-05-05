@@ -1,6 +1,6 @@
 import React from "react";
 import { Meteors } from "./ui/meteors";
-
+//modify code from Aceternity UI
 export function MeteorsDemo() {
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-gray-900">
@@ -17,12 +17,12 @@ export function MeteorsDemo() {
       <div className="relative z-50 flex min-h-screen items-center justify-center">
         <div className="max-w-xl rounded-2xl bg-gray-900/80 p-8 backdrop-blur-md">
 
-          <h1 className="mb-4 text-xl font-bold text-white">
-            Meteors because they&apos;re cool
+          <h1 className="mb-4 text-[200%] font-bold text-white text-center">
+            Your goal. Your progress. Powered by AI Learning Path Generator
           </h1>
 
-          <p className="text-slate-400">
-            I don&apos;t know what to write so I&apos;ll just paste something cool here.
+          <p className="text-slate-400 text-center">
+            Set your goals, and let us build a personalized roadmap to get your there
           </p>
 
         </div>
