@@ -35,6 +35,12 @@ class Settings(BaseSettings):
         description="API key to use groq (AI)"
     )
 
+    youtube_api_key: str = Field(
+        default="",
+        alias="YOUTUBE_API_KEY",
+        description="API key for Youtube"
+    )
+
 
     #Adding config for .env file
     model_config = SettingsConfigDict(
