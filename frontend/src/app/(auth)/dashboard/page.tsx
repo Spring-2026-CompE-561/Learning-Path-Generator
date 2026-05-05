@@ -13,7 +13,7 @@ export default function Dashboard() {
 
   // fetch learning paths from backend
   const fetchPaths = async () => {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("access_token")
 
     // basic guard (for preventing unnecessary request)
     if (!token) {
@@ -66,12 +66,10 @@ export default function Dashboard() {
             </h2>
 
             <p className="text-sm text-gray-500">
-              Proficiency: {path.proficiency || "N/A"}
+              Proficiency: {path.proficency || "N/A"}
             </p>
 
-            <p className="text-sm text-gray-500">
-              Type: {path.learning_type?.join(", ") || "N/A"}
-            </p>
+           
 
             <p className="text-sm text-gray-500">
               Weeks: {path.weeks ?? "N/A"}
