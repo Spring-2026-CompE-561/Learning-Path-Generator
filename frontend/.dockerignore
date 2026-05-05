@@ -1,0 +1,22 @@
+# node_modules is huge AND platform-specific — let `bun install` rebuild
+# it inside the Linux container.
+node_modules/
+
+# Next.js build output — should be regenerated inside the container.
+.next/
+out/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Editor/OS noise
+.DS_Store
+.idea/
+.vscode/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
