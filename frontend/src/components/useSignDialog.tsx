@@ -23,7 +23,7 @@ export function DialogSignin({ open, onOpenChange, onRegisterSuccess }: DialogSi
   return (
     //Dialog component are open
     <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogTrigger render={<Button variant="outline">Sign in</Button>} />
+        <DialogTrigger render={<Button variant="outline">Sign Up</Button>} />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Create your LearningPath Account</DialogTitle>
