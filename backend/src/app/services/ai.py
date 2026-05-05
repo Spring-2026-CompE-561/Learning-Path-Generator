@@ -3,6 +3,7 @@
 import json
 import os
 from urllib.parse import quote_plus
+import httpx
 from groq import Groq
 from app.core.settings import settings
 
@@ -10,6 +11,53 @@ from app.schemas.weeklyPlan import WeeklyPlanCreate
 # FIX -> AI SOMETIMES USES ALT SPELLINGS IN QUERUES -> CSHARP VS C#, CAN FIX LATER THROUGH INJECTING TOPIC NAME IN PYTHON
 # connecting to the GROQ servers and making a client through the api key in .env
 connection = Groq(api_key=settings.groq_api_key)
+
+# returns the top video from the search query adn adds an actual URL
+def searchYoutube(query: str) -> str:
+    # no api key, fall back to just a search not an actual url
+    if not settings.youtube_api_key:
+        return f"https://www.youtube.com/results?search_query={quote_plus(query)}"
+
+     
+    try:
+        # sned a get req  
+        response = httpx.get(
+            "https://www.googleapis.com/youtube/v3/search",
+            params={
+                "part": "snippet",
+                "q": query,
+                "type": "video",
+                "maxResults": 1,
+                "key": settings.youtube_api_key,
+            },
+            timeout = 5.0,
+        )
+
+        # raise an exception if theres an error coming from yt
+        response.raise_for_status()
+
+        # parse json response
+        data = response.json()
+
+        # grab items
+        items = data.get("items", [])
+
+        # no results from yt =  go abck to search query
+        if not items:
+            return f"https://www.youtube.com/results?search_query={quote_plus(query)}"
+        
+        # pull first result and its id
+        video_id = items[0]["id"]["videoId"]
+
+        # actuall build the url
+        return f"https://www.youtube.com/watch?v={video_id}"
+    
+    except (httpx.RequestError, httpx.HTTPStatusError, KeyError, ValueError):
+
+        # if anything goes wrong just go to search query
+        return f"https://www.youtube.com/results?search_query={quote_plus(query)}"
+
+
 
 # this would be the function we use to build the URL off of the search queries, doing this because AI would jsut make random ass URLs that arent real
 def buildURL(resource_type: str, query: str) -> str:
@@ -19,7 +67,7 @@ def buildURL(resource_type: str, query: str) -> str:
 
     # for going to yt since video should most likely go to yt
     if resource_type == "video":
-        return f"https://www.youtube.com/results?search_query={temp_query}"
+        return searchYoutube(query)
     else:
         return f"https://www.google.com/search?q={temp_query}"
 
