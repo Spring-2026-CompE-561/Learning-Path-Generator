@@ -35,5 +35,7 @@ class LearningPath(Base):
     # connecting back and matching to the relationship called in User.py
     user = relationship("User", back_populates="learning_paths")
 
-    # making new realtionship with the weekly
-    weekly_plans = relationship("WeeklyPlan", back_populates="learning_path")
+    # cascade so deleting a learning path also removes its weekly plans (and their resources)
+    weekly_plans = relationship(
+        "WeeklyPlan", back_populates="learning_path", cascade="all, delete-orphan"
+    )
