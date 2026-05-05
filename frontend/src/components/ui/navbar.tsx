@@ -28,7 +28,7 @@ export function Navbar() {
 
 function DesktopNavbar() {
     return (
-        <div className="hidden border-separate border-b bg-background md:block">
+        <div className="hidden border-separate border-b bg-background md:block bg-primary text-foreground">
             <nav className="w-full h-fit flex items-center justify-between p-5 bg-black-100">
                 {/* loop through the nav items and create a new navbar item for each link */}
                 {NavItems.map((item) => (
@@ -97,8 +97,8 @@ function NavbarItem({ link, label, clickCallBack }: Readonly<navItemsProps>) {
                 href={link}
                 className={cn(
                     buttonVariants({variant: "ghost" }),
-                        "w-full justify-start text-xl text-muted-foreground hover:text-yellow-500",
-                    isActive && "text-yellow-500",
+                        "w-full justify-start text-xl text-muted-foreground hover:text-foreground",
+                    isActive && "text-foreground",
                 )}
                 onClick={() => {
                     if (clickCallBack) clickCallBack();
@@ -107,7 +107,7 @@ function NavbarItem({ link, label, clickCallBack }: Readonly<navItemsProps>) {
                 {label}
             </Link>
             {isActive && (
-                <div className="absolute -bottom-1 left-0 w-full h-1 bg-yellow-500 rounded" />
+                <div className="absolute -bottom-1 left-0 w-full h-1 bg-foreground rounded" />
             )}
         </div>
     );
