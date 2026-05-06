@@ -4,85 +4,257 @@ A FastAPI backend API for generating personalized learning schedules. Users can 
 
 ## Tech Stack
 
-- **FastAPI** - Web framework
-- **SQLAlchemy** - ORM with SQLite (default)
-- **PyJWT + Argon2** - JWT authentication and password hashing
-- **Pydantic** - Data validation and settings management
-- **uv** - Package manager
+### Backend
+
+* **FastAPI** - Web framework
+* **PostgreSQL (Docker)** - Database
+* **SQLAlchemy** - ORM
+* **PyJWT + Argon2** - Authentication & password hashing
+* **Pydantic** - Data validation
+
+### Frontend
+
+* **Next.js 16 (App Router + Turbopack)**
+* **React + TypeScript**
+* **shadcn/ui** - Component system
+* **Bun** - Runtime & package manager
+
+### DevOps
+
+* **Docker + Docker Compose** - Containerized development
+
+---
 
 ## Prerequisites
 
-- Python 3.12+
-- [uv](https://docs.astral.sh/uv/) package manager
+* **Docker** (Docker Desktop recommended)
 
-## Getting Started
+> This project uses **Docker Compose v2** (`docker compose`).
+> Modern Docker installations already include this.
 
-### 1. Clone and navigate to the project
+### Verify installation
+
+```bash
+docker --version
+docker compose version
+```
+
+If both commands work, you're ready to go.
+
+---
+
+## Getting Started (Docker - Recommended)
+
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Spring-2026-CompE-561/Learning-Path-Generator.git
 cd Learning-Path-Generator
 ```
 
-### 2. Install dependencies
+---
+
+### 2. Set up environment variables
+
+Create a `.env` file inside the **backend folder**:
 
 ```bash
-uv sync
+cp backend/.env.example backend/.env
 ```
 
-To include dev tools (ruff, pytest, pre-commit):
-
-```bash
-uv sync --group dev
-```
-
-### 3. Set up environment variables
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and configure:
+Update `backend/.env` with the following values:
 
 ```
 SECRET_KEY=<output of: openssl rand -hex 32>
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
-DATABASE_URL=sqlite:///./learning_paths.db
+DATABASE_URL=postgresql://postgres:postgres@db:5432/learning_paths_test
+
+GROQ_API_KEY=your_groq_api_key_here
+YOUTUBE_API_KEY=your_youtube_api_key_here
 ```
 
-### 4. Run the development server
+---
+
+### 3. Run the application
+
+#### Mac / Windows:
 
 ```bash
-uv run fastapi dev src/app/main.py
+docker compose up --build
 ```
 
-The server starts at **http://localhost:8000**.
+#### Ubuntu / Linux:
 
-- Swagger UI docs: http://localhost:8000/docs
-- ReDoc docs: http://localhost:8000/redoc
+```bash
+sudo docker compose up --build
+```
+
+---
+
+### 4. Access the application
+
+Once Docker Compose is running:
+
+* **Frontend (Next.js)**: [http://localhost:3000](http://localhost:3000)
+* **Backend API**: [http://localhost:8000](http://localhost:8000)
+* **Swagger Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+* **ReDoc Docs**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+The frontend communicates with the backend automatically via the configured environment variables.
+
+---
+
+## Services Overview
+
+The root-level `docker-compose.yml` runs the full application stack:
+
+* **db** - PostgreSQL 16 database using a named Docker volume (`pgdata`)
+* **backend** - FastAPI backend built from `backend/Dockerfile`
+* **frontend** - Next.js frontend built from `frontend/Dockerfile`
+
+### Docker Compose Behavior
+
+* PostgreSQL runs first and uses a healthcheck with `pg_isready`
+* Backend waits for the database to become healthy before starting
+* Frontend waits for the backend service
+* Backend source is bind-mounted for hot reload
+* Frontend source is bind-mounted for hot reload
+* Anonymous volumes protect container-specific `.venv`, `node_modules`, and `.next` folders
+
+### Environment Variables Used by Compose
+
+The backend loads variables from:
+
+```bash
+backend/.env
+```
+
+Docker Compose overrides `DATABASE_URL` inside the backend container so the backend connects to PostgreSQL using the Docker service name `db` instead of `localhost`:
+
+```bash
+DATABASE_URL=postgresql+psycopg://learning_app:dev_password_123@db:5432/learning_paths
+```
+
+The frontend uses:
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000
+INTERNAL_API_URL=http://backend:8000
+```
+
+* `NEXT_PUBLIC_API_URL` is used by browser-side frontend requests
+* `INTERNAL_API_URL` is used inside the frontend container for server-side requests
+
+---
+
+## Backend (FastAPI)
+
+The backend is a **FastAPI application** located under `backend/src/app/`. The `backend/` folder also contains its own `Dockerfile`, dependency files, and environment file.
+
+### Backend Structure
+
+```
+backend/
+├── src/
+│   └── app/
+│       ├── main.py
+│       ├── core/              # auth, database, settings
+│       ├── exceptions/
+│       ├── models/            # ORM models
+│       ├── schemas/           # Pydantic schemas
+│       ├── routes/            # API endpoints
+│       ├── services/          # business logic (incl. ai.py)
+│       ├── repository/        # data access layer
+│       └── tests/             # unit tests
+├── .env
+├── .env.example
+├── Dockerfile
+├── pyproject.toml
+├── pytest.ini
+├── requirements.txt
+└── uv.lock
+```
+
+---
+
+## Frontend (Next.js + shadcn/ui)
+
+The frontend is built using **Next.js (App Router + Turbopack)** and **Bun**, with UI components based on **shadcn/ui**.
+
+### Key Notes
+
+* Uses **App Router structure** (`src/app/`)
+* Organized route groups (e.g. `(auth)`)
+* Reusable UI components via `components/ui/`
+* Custom hooks for dialogs and state management
+
+### Structure Overview
+
+```
+frontend/
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   ├── account/
+│   │   │   ├── dashboard/
+│   │   │   └── schedule/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── globals.css
+│   ├── components/
+│   │   ├── ui/              # shadcn/ui components (Button, Dialog, etc.)
+│   │   ├── meteor.tsx
+│   │   ├── useLearningPathDialog.tsx
+│   │   ├── useLogDialog.tsx
+│   │   ├── useProfile.tsx
+│   │   └── useSignDialog.tsx
+│   └── lib/
+```
+
+### UI Components (shadcn)
+
+This project follows **shadcn/ui conventions**:
+
+* Components are locally installed and customizable
+* Examples include:
+
+  * Dialogs
+  * Buttons
+  * Forms
+  * Inputs
+
+To add new components:
+
+```bash
+npx shadcn-ui@latest add <component-name>
+```
+
+---
 
 ## API Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/users/register` | Register a new user |
-| POST | `/users/login` | Login (returns JWT token) |
-| POST | `/users/logout` | Logout / revoke tokens |
-| PUT | `/users/update` | Update user credentials |
-| DELETE | `/users/me` | Delete user account |
-| POST | `/learning-paths/` | Create a learning path |
-| GET | `/learning-paths/` | Get all user's learning paths |
-| GET | `/learning-paths/{id}` | Get a specific learning path |
-| PUT | `/learning-paths/{id}` | Update a learning path |
-| DELETE | `/learning-paths/{id}` | Delete a learning path |
-| GET | `/learning-paths/{id}/weeklyplan` | Get weekly plans for a path |
-| POST | `/resources` | Create a resource |
-| GET | `/weeklyplan/{id}/resources` | Get resources for a weekly plan |
-| PUT | `/resources/{id}` | Update a resource |
-| DELETE | `/resources/{id}` | Delete a resource |
+| Method | Endpoint                          | Description                     |
+| ------ | --------------------------------- | ------------------------------- |
+| POST   | `/users/register`                 | Register a new user             |
+| POST   | `/users/login`                    | Login (returns JWT token)       |
+| POST   | `/users/logout`                   | Logout / revoke tokens          |
+| PUT    | `/users/update`                   | Update user credentials         |
+| DELETE | `/users/me`                       | Delete user account             |
+| POST   | `/learning-paths/`                | Create a learning path          |
+| GET    | `/learning-paths/`                | Get all user's learning paths   |
+| GET    | `/learning-paths/{id}`            | Get a specific learning path    |
+| PUT    | `/learning-paths/{id}`            | Update a learning path          |
+| DELETE | `/learning-paths/{id}`            | Delete a learning path          |
+| GET    | `/learning-paths/{id}/weeklyplan` | Get weekly plans for a path     |
+| POST   | `/resources`                      | Create a resource               |
+| GET    | `/weeklyplan/{id}/resources`      | Get resources for a weekly plan |
+| PUT    | `/resources/{id}`                 | Update a resource               |
+| DELETE | `/resources/{id}`                 | Delete a resource               |
 
 All endpoints except register and login require a Bearer JWT token.
+
+---
 
 ## Data Model
 
@@ -90,176 +262,118 @@ All endpoints except register and login require a Bearer JWT token.
 User → LearningPath → WeeklyPlan → Resource
 ```
 
-- **User** - Account with username, email, hashed password
-- **LearningPath** - A topic to learn with proficiency level, learning preferences, and duration (1-52 weeks)
-- **WeeklyPlan** - Weekly goals and completion tracking for a learning path
-- **Resource** - Learning materials (videos, articles, tutorials, etc.) linked to a weekly plan
+---
 
 ## Project Structure
 
+The project is split into two main applications: a **FastAPI backend** and a **Next.js frontend**. Each application has its own `Dockerfile`, and the root-level `docker-compose.yml` builds and runs both containers together with PostgreSQL.
+
 ```
-src/app/
-├── main.py            # App entry point, router registration, CORS, middleware
-├── core/
-│   ├── settings.py    # App configuration from .env
-│   ├── database.py    # SQLAlchemy engine and session setup
-│   ├── auth.py        # JWT and password utilities
-│   └── experienceLevel.py
-├── models/            # SQLAlchemy ORM models
-├── schemas/           # Pydantic request/response schemas
-├── routes/            # API endpoint definitions
-├── services/          # Business logic layer
-├── repository/        # Data access layer
-├── exceptions/        # Custom exceptions
-└── tests/             # Unit tests
+Learning-Path-Generator/
+├── backend/
+│   ├── src/                  # FastAPI application source code
+│   ├── .dockerignore
+│   ├── .env.example
+│   ├── .python-version
+│   ├── Dockerfile            # Backend container build file
+│   ├── pyproject.toml
+│   ├── pytest.ini
+│   ├── requirements.txt
+│   └── uv.lock
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── (auth)/
+│   │   │   │   ├── account/
+│   │   │   │   ├── dashboard/
+│   │   │   │   └── schedule/
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx
+│   │   │   └── globals.css
+│   │   ├── components/
+│   │   │   ├── ui/           # shadcn/ui components
+│   │   │   ├── meteor.tsx
+│   │   │   ├── useLearningPathDialog.tsx
+│   │   │   ├── useLogDialog.tsx
+│   │   │   ├── useProfile.tsx
+│   │   │   └── useSignDialog.tsx
+│   │   └── lib/
+│   ├── .dockerignore
+│   ├── Dockerfile            # Frontend container build file
+│   ├── bun.lock
+│   ├── components.json       # shadcn/ui config
+│   ├── next.config.ts
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── docker/
+│   └── postgres-init.sql     # PostgreSQL initialization script
+│
+├── docs/
+│   └── LearnPathAPI.yaml
+│
+└── docker-compose.yml        # Runs db, backend, and frontend together
 ```
 
-## Development
+---
 
-### Run linter and formatter
+## Development (Optional - Local without Docker)
+
+### Backend
 
 ```bash
-uv run ruff check src/
-uv run ruff format src/
+uv sync
+uv run fastapi dev src/app/main.py
 ```
 
-### Run tests
+### Frontend
 
 ```bash
-uv run python -m pytest
+bun install
+bun run dev
 ```
 
-Run a specific test file:
+> Note: `bun run dev` is sufficient. You do **not** need `--bun` unless explicitly required for a script override.
 
-```bash
-uv run python -m pytest src/app/tests/unit_tests/user/test_user_routes.py
-```
+---
 
-### Pre-commit hooks
+## Testing
 
-Install hooks (one-time setup):
-
-```bash
-uv run pre-commit install
-```
-
-Run manually on all files:
-
-```bash
-uv run pre-commit run --all-files
-```
-
-## Full API Spec
-
-See [docs/LearnPathAPI.yaml](docs/LearnPathAPI.yaml) for the complete OpenAPI 3.0.3 specification.
-
-
-# How to run tests
-
-# Testing Guide
-
-## Setup
-
-Make sure you have the dev dependencies installed and a `.env` file at the project root:
-
-```bash
-uv sync --group dev
-```
-
-Your `.env` should have:
-```
-SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-DATABASE_URL=sqlite:///./learning_paths.db
-```
-
-All tests use an isolated SQLite test database so your real data is never touched.
-## Running All Tests
+### Run all tests
 
 ```bash
 uv run pytest src/app/tests/ -v
 ```
 
-## Running Tests by Object
+### Run specific test groups
 
-### User
 ```bash
+# User
 uv run pytest src/app/tests/unit_tests/user/ -v
-```
 
-### Learning Path
-```bash
+# Learning Path
 uv run pytest src/app/tests/unit_tests/learning_path/ -v
-```
 
-### Weekly Plan
-```bash
+# Weekly Plan
 uv run pytest src/app/tests/unit_tests/weekly_plan/ -v
-```
 
-### Resource
-```bash
+# Resource
 uv run pytest src/app/tests/unit_tests/resources/ -v
 ```
 
 ---
 
-## Running Tests by Layer
+## Notes
 
-### Repository only (database operations)
-```bash
-uv run pytest src/app/tests/ -v -k "repository"
-```
-
-### Service only (business logic)
-```bash
-uv run pytest src/app/tests/ -v -k "service"
-```
-
-### Routes only (HTTP endpoints)
-```bash
-uv run pytest src/app/tests/ -v -k "routes"
-```
-
-## Running a Single Test
-
-```bash
-uv run pytest src/app/tests/unit_tests/user/test_user_routes.py::test_register_user_success -v
-```
+* Database data persists using Docker volumes
+* Backend waits for database readiness before starting
+* Hot reload is enabled for development
+* `.env` must be placed inside the `backend/` directory (not root)
 
 ---
 
-## Test Structure
+## Full API Spec
 
-```
-src/app/tests/
-    conftest.py                          # shared fixtures (db, client)
-    unit_tests/
-        user/
-            conftest.py                  # user fixtures
-            test_user_repository.py
-            test_user_routes.py
-            test_user_service.py
-        learning_path/
-            conftest.py                  # learning path fixtures
-            test_learning_path_repository.py
-            test_learning_path_routes.py
-            test_learning_path_service.py
-        weekly_plan/
-            conftest.py                  # weekly plan fixtures
-            test_weekly_plan_repository.py
-            test_weekly_plan_routes.py
-            test_weekly_plan_service.py
-        resources/
-            conftest.py                  # resource fixtures
-            test_resource_repository.py
-            test_resource_routes.py
-            test_resource_service.py
-```
-
-## Notes
-
-- Tests are isolated, each test starts with a fresh database and cleans up after itself
-- The `conftest.py` in each folder provides fixtures specific to that object
-- The top-level `conftest.py` provides the shared `db` and `client` fixtures used by all tests
+See `docs/LearnPathAPI.yaml` for the OpenAPI specification
