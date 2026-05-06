@@ -10,6 +10,13 @@ import {
   Pencil,
   Headphones,
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 // week starts on monday so that the weekend sits at the end
@@ -81,6 +88,15 @@ const colorPalette = [
 const fallbackColor = {
   card: "border-l-gray-300 bg-white",
   fill: "bg-gray-400",
+};
+
+// labels shown in the week dropdown, keyed by offset as a string since Select uses strings
+const weekOffsetLabels: Record<string, string> = {
+  "0": "This week",
+  "1": "In 1 week",
+  "2": "In 2 weeks",
+  "3": "In 3 weeks",
+  "4": "In 4 weeks",
 };
 
 // rotating subtitle, one is picked on every fresh mount
@@ -194,6 +210,12 @@ export default function Schedule() {
     Record<string, ScheduledItem[]>
   >(() => Object.fromEntries(days.map((d) => [d, [] as ScheduledItem[]])));
 
+  // raw fetched paths kept around so changing the offset rebuilds without a refetch
+  const [paths, setPaths] = React.useState<LearningPath[]>([]);
+
+  // 0 means current week, capped at 4 so the dropdown only shows up to four weeks ahead
+  const [weekOffset, setWeekOffset] = React.useState(0);
+
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -206,9 +228,10 @@ export default function Schedule() {
     Record<number, (typeof colorPalette)[number]>
   >({});
 
-  // pull the schedule from the backend on mount
+  // fetch every path + its weekly plans once on mount, store the raw data in state
+  // the second effect turns that into a per-day schedule for whichever week is selected
   React.useEffect(() => {
-    const fetchSchedule = async () => {
+    const fetchPaths = async () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         router.push("/");
@@ -216,7 +239,6 @@ export default function Schedule() {
       }
 
       try {
-        // step 1, list every learning path the user owns
         const listRes = await fetch("http://127.0.0.1:8000/learning-paths/", {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -228,7 +250,6 @@ export default function Schedule() {
         if (!listRes.ok) throw new Error("Failed to fetch learning paths");
         const list: LearningPath[] = await listRes.json();
 
-        // step 2, fan out to the detail endpoint so we get weekly plans + resources
         const detailed = await Promise.all(
           list.map(async (p) => {
             const res = await fetch(
@@ -240,84 +261,7 @@ export default function Schedule() {
           })
         );
 
-        // step 3, drop one resource per day so each card has a single task
-        const next: Record<string, ScheduledItem[]> = Object.fromEntries(
-          days.map((d) => [d, [] as ScheduledItem[]])
-        );
-
-        // pull whatever we saved on a previous visit so the layout stays stable
-        const saved = loadState();
-        const layouts: Record<string, number[]> = { ...saved.layouts };
-        const colors: Record<number, number> = { ...saved.colors };
-
-        detailed.forEach((path) => {
-          if (!path) return;
-          const wkNum = currentWeekNumber(path);
-          const plan = path.weekly_plans.find((w) => w.week_number === wkNum);
-          if (!plan) return;
-
-          // single resource per day, capped at seven so we never overflow the week
-          const resources = plan.resources.slice(0, days.length);
-          const layoutKey = `${path.id}-${plan.week_number}`;
-
-          // reuse the saved slot positions, only regenerate when we have nothing or
-          // the resource count has changed since last time (eg. plan was regenerated)
-          let slots = layouts[layoutKey];
-          if (!slots || slots.length !== resources.length) {
-            slots = pickDayIndices(resources.length, days.length);
-            layouts[layoutKey] = slots;
-          }
-
-          resources.forEach((resource, i) => {
-            const day = days[slots[i]];
-            next[day].push({
-              pathId: path.id,
-              topic: path.topic,
-              weekNumber: plan.week_number,
-              totalWeeks: path.weeks,
-              resource,
-              completed: plan.completion_status,
-            });
-          });
-        });
-
-        // assign a stable color to each path, reusing saved picks when present
-        const uniquePathIds = Array.from(
-          new Set(
-            Object.values(next).flatMap((items) => items.map((i) => i.pathId))
-          )
-        ).sort((a, b) => a - b);
-
-        // track which palette slots are already taken so new paths prefer unused colors
-        const usedIndices = new Set<number>();
-        uniquePathIds.forEach((id) => {
-          if (typeof colors[id] === "number") {
-            usedIndices.add(colors[id]);
-          }
-        });
-
-        const map: Record<number, (typeof colorPalette)[number]> = {};
-        uniquePathIds.forEach((id) => {
-          if (typeof colors[id] !== "number") {
-            // pick from unused palette slots first, fall back to any when all are taken
-            const free = colorPalette
-              .map((_, idx) => idx)
-              .filter((idx) => !usedIndices.has(idx));
-            const pick =
-              free.length > 0
-                ? free[Math.floor(Math.random() * free.length)]
-                : Math.floor(Math.random() * colorPalette.length);
-            colors[id] = pick;
-            usedIndices.add(pick);
-          }
-          map[id] = colorPalette[colors[id]];
-        });
-
-        // persist so the next reload sees the same layout + colors
-        saveState({ layouts, colors });
-
-        setSchedule(next);
-        setColorMap(map);
+        setPaths(detailed.filter((p): p is LearningPath => p !== null));
       } catch (err) {
         console.error("Error fetching schedule:", err);
         setError("Could not load schedule. Please try again.");
@@ -326,7 +270,7 @@ export default function Schedule() {
       }
     };
 
-    fetchSchedule();
+    fetchPaths();
 
     // pick a fresh subtitle on every mount so the page feels alive
     setSubtitle(
@@ -334,14 +278,125 @@ export default function Schedule() {
     );
   }, [router]);
 
+  // rebuild the per-day schedule whenever the fetched paths or the chosen offset change
+  // pulls saved layout + colors from localStorage so reloading does not reshuffle anything
+  React.useEffect(() => {
+    if (paths.length === 0) {
+      setSchedule(
+        Object.fromEntries(days.map((d) => [d, [] as ScheduledItem[]]))
+      );
+      setColorMap({});
+      return;
+    }
+
+    const next: Record<string, ScheduledItem[]> = Object.fromEntries(
+      days.map((d) => [d, [] as ScheduledItem[]])
+    );
+
+    const saved = loadState();
+    const layouts: Record<string, number[]> = { ...saved.layouts };
+    const colors: Record<number, number> = { ...saved.colors };
+
+    paths.forEach((path) => {
+      // shift the target week by the dropdown offset, skip the path if it is finished by then
+      const targetWeek = currentWeekNumber(path) + weekOffset;
+      if (targetWeek > path.weeks) return;
+
+      const plan = path.weekly_plans.find((w) => w.week_number === targetWeek);
+      if (!plan) return;
+
+      // single resource per day, capped at seven so we never overflow the week
+      const resources = plan.resources.slice(0, days.length);
+      const layoutKey = `${path.id}-${plan.week_number}`;
+
+      // reuse saved slot positions, regenerate only when missing or the count changed
+      let slots = layouts[layoutKey];
+      if (!slots || slots.length !== resources.length) {
+        slots = pickDayIndices(resources.length, days.length);
+        layouts[layoutKey] = slots;
+      }
+
+      resources.forEach((resource, i) => {
+        const day = days[slots[i]];
+        next[day].push({
+          pathId: path.id,
+          topic: path.topic,
+          weekNumber: plan.week_number,
+          totalWeeks: path.weeks,
+          resource,
+          completed: plan.completion_status,
+        });
+      });
+    });
+
+    // assign a stable color to each path, reusing saved picks when present
+    const uniquePathIds = Array.from(
+      new Set(
+        Object.values(next).flatMap((items) => items.map((i) => i.pathId))
+      )
+    ).sort((a, b) => a - b);
+
+    const usedIndices = new Set<number>();
+    uniquePathIds.forEach((id) => {
+      if (typeof colors[id] === "number") {
+        usedIndices.add(colors[id]);
+      }
+    });
+
+    const map: Record<number, (typeof colorPalette)[number]> = {};
+    uniquePathIds.forEach((id) => {
+      if (typeof colors[id] !== "number") {
+        const free = colorPalette
+          .map((_, idx) => idx)
+          .filter((idx) => !usedIndices.has(idx));
+        const pick =
+          free.length > 0
+            ? free[Math.floor(Math.random() * free.length)]
+            : Math.floor(Math.random() * colorPalette.length);
+        colors[id] = pick;
+        usedIndices.add(pick);
+      }
+      map[id] = colorPalette[colors[id]];
+    });
+
+    saveState({ layouts, colors });
+
+    setSchedule(next);
+    setColorMap(map);
+  }, [paths, weekOffset]);
+
   // tiny helper so the JSX below stays readable
   const colorFor = (id: number) => colorMap[id] ?? fallbackColor;
 
   return (
     <div className="relative min-h-screen w-full p-8">
-      {/* page heading, matches dashboard typography */}
-      <h1 className="text-2xl font-bold">Schedule</h1>
-      <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+      {/* heading on the left, week selector on the right */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">Schedule</h1>
+          <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+        </div>
+
+        {/* lets the user peek up to four weeks ahead, current week is the default */}
+        <Select
+          value={String(weekOffset)}
+          onValueChange={(v) => setWeekOffset(Number(v))}
+        >
+          <SelectTrigger className="w-[180px]">
+            {/* base ui's SelectValue defaults to the raw value, render the label instead */}
+            <SelectValue>
+              {(value: string) => weekOffsetLabels[value] ?? "This week"}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="0">This week</SelectItem>
+            <SelectItem value="1">In 1 week</SelectItem>
+            <SelectItem value="2">In 2 weeks</SelectItem>
+            <SelectItem value="3">In 3 weeks</SelectItem>
+            <SelectItem value="4">In 4 weeks</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {loading && <p className="mt-6 text-sm text-gray-500">Loading...</p>}
       {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
@@ -350,7 +405,8 @@ export default function Schedule() {
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7">
         {days.map((day, idx) => {
           const items = schedule[day] ?? [];
-          const isToday = day === today;
+          // only highlight today when viewing the current week, future weeks have no "today"
+          const isToday = weekOffset === 0 && day === today;
           const isLast = idx === days.length - 1;
 
           return (
