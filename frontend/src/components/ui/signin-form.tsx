@@ -228,7 +228,7 @@ export function SigninForm({className, onRegisterSuccess, ...props
                   )}
               />
               <Field>
-                  <Button type="submit">Sign in</Button>
+                  <Button type="submit">Sign Up</Button>
               </Field>
   
             </FieldGroup>

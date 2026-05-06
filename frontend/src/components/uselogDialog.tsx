@@ -28,7 +28,7 @@ export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLo
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
         {showTrigger && (
-          <DialogTrigger render={<Button variant="outline">Log in</Button>} />
+          <DialogTrigger render={<Button variant="outline">Login</Button>} />
         )}
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>

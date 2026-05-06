@@ -41,7 +41,8 @@ app.add_middleware(
         "http://127.0.0.1:3000",
         ],
     allow_credentials=True,
-    allow_methods=["*"],
+    # listing methods explicitly because "*" can break preflight on DELETE when allow_credentials is True
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 # Configure logging to output INFO level logs to the terminal

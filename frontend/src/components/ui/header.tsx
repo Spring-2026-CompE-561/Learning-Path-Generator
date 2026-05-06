@@ -3,6 +3,8 @@
 import { usePathname } from 'next/navigation';
 import { DialogLogin } from "@/components/uselogDialog";
 import { DialogSignin } from "@/components/useSignDialog";
+import { handleLogOut } from "@/components/useprofile";
+import { Button } from "@/components/ui/button";
 import * as React from "react";
 
 //list of name of the pages in the app
@@ -89,10 +91,13 @@ export function Header() {
                     <div className="w-fill h-fit flex items-center justify-center">
                         <p> {pageTitle || 'Unknown Page'}</p>
                     </div>
+                    <div className="w-fill h-fit flex items-center justify-end gap-2">
+                        <Button variant="outline" onClick={handleLogOut}>Log Out</Button>
+                    </div>
                 </div>
 
             </header>
-        );    
+        );
     }
 
 }

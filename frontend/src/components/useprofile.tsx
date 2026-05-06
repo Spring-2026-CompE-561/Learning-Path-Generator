@@ -86,7 +86,7 @@ async function handleDeleteAccount() {
 }
 
 //function to log out account
-async function handleLogOut() {
+export async function handleLogOut() {
 
     const token = localStorage.getItem("access_token")
 
