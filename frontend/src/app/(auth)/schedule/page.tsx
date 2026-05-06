@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { getToken, clearToken } from "@/lib/auth";
 
 // week starts on monday so that the weekend sits at the end
 const days = [
@@ -232,7 +233,7 @@ export default function Schedule() {
   // the second effect turns that into a per-day schedule for whichever week is selected
   React.useEffect(() => {
     const fetchPaths = async () => {
-      const token = localStorage.getItem("access_token");
+      const token = getToken();
       if (!token) {
         router.push("/");
         return;
@@ -243,7 +244,7 @@ export default function Schedule() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (listRes.status === 401) {
-          localStorage.removeItem("access_token");
+          clearToken();
           router.push("/");
           return;
         }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Trash2 } from "lucide-react"
 import { LearningPathDialog } from "@/components/useLearningPathDialog"
 import { Button } from "@/components/ui/button"
+import { getToken } from "@/lib/auth"
 
 export default function Dashboard() {
   const router = useRouter()
@@ -15,7 +16,7 @@ export default function Dashboard() {
   const [deletingId, setDeletingId] = React.useState<number | null>(null)
 
   const fetchPaths = async () => {
-    const token = localStorage.getItem("access_token")
+    const token = getToken()
 
     if (!token) return
 
@@ -40,7 +41,7 @@ export default function Dashboard() {
     e.stopPropagation()
     if (!confirm("Delete this learning path? This cannot be undone.")) return
 
-    const token = localStorage.getItem("access_token")
+    const token = getToken()
     if (!token) return
 
     setDeletingId(pathId)

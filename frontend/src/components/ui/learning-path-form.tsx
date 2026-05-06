@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import * as z from "zod"
 
 import { cn } from "@/lib/utils"
+import { getToken, clearToken } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -69,7 +70,7 @@ export function LearningPathForm({ className, onCreateSuccess, ...props }: Learn
 
     try {
       // grab token from login
-      const token = localStorage.getItem("access_token")
+      const token = getToken()
 
       // send POST request also tells backend who made it 
       const res = await fetch("http://127.0.0.1:8000/learning-paths/", {
@@ -84,7 +85,7 @@ export function LearningPathForm({ className, onCreateSuccess, ...props }: Learn
 
       // token expired, clear and relog
       if (res.status === 401) {
-        localStorage.removeItem("access_token")
+        clearToken()
         toast.error("Session expired, please log in again")
         return
       }
