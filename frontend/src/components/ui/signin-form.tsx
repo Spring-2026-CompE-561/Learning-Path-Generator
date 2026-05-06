@@ -23,7 +23,8 @@ import {
   FieldError,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context"
+import { setToken } from "@/lib/auth"
+import { useRouter } from "next/navigation"
 
 
 
@@ -51,13 +52,21 @@ const formSchema = z.object({
 
 //function to be called on successful registration
 type SigninFormProps = React.ComponentProps<"div"> & {
+  // fired when register succeeded but auto-login did NOT — parent should open
+  // the login dialog so the user can retry manually
   onRegisterSuccess?: () => void
+  // fired when register AND auto-login both succeeded — parent should just
+  // close the signup dialog, since the user is already on their way to /dashboard
+  onAutoLoginSuccess?: () => void
 }
 
-export function SigninForm({className, onRegisterSuccess, ...props
+export function SigninForm({className, onRegisterSuccess, onAutoLoginSuccess, ...props
 }: SigninFormProps) {
   //function to handle form submission
-  
+
+  //router used to send the user straight to the dashboard after auto-login
+  const router = useRouter()
+
   //hook to call
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -91,46 +100,54 @@ export function SigninForm({className, onRegisterSuccess, ...props
       })
       return
     }
-    
-    //waiting backend reponse
-    const returnedData = await res.json();
-    
-    //FIXME: For testing using the uncomment code
-    //The comment code is for successful login, for real implementation
-    // toast.success("Login successful!",
-    //   {position: "top-center"})
-    //   form.reset()
-    
-    //code to display submited input as JSON in the toast
-    toast("Here is your Account Information:", {      
-      description: (
-        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-          <code>
-            {res.status === 201?
-             "Account created Successfully ! \n You can now log in with your credentials." :
-             "Unexpected response from server. Please try again later."
-            }
-            </code>
-        </pre>
-      ),
-      position: "bottom-right",
-      classNames: {
-        content: "flex flex-col gap-2",
-      },
-      style: {
-        "--border-radius": "calc(var(--radius)  + 4px)",
-      } as React.CSSProperties,
-    });
-    
-    //reset form after successful submission
-    //and confirm the resiter is successfull
-    if(res.status === 201){
-      form.reset()
-      onRegisterSuccess?.()
+
+    if (res.status !== 201) {
+      toast.error("Unexpected response from server. Please try again later.", {
+        position: "top-center",
+      })
+      return
     }
 
-    return returnedData;
+    //register succeeded — try logging the user in immediately with the same
+    //credentials so they skip the "now type your password again" step. The
+    //login endpoint accepts form-encoded `username`+`password` (oauth2 style)
+    //and `username` here is actually the email, matching the login form.
+    try {
+      const loginRes = await fetch("http://127.0.0.1:8000/users/login", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          username: data.email,
+          password: data.password,
+        }).toString(),
+      })
 
+      if (loginRes.ok) {
+        const returnedLogin = await loginRes.json()
+        //fresh signups default to persistent storage — first-time users almost
+        //always want to stay signed in. They can flip Remember me off the next
+        //time they log in if they prefer session-only.
+        setToken(returnedLogin.access_token, true)
+        toast.success("Account created — welcome!", { position: "top-center" })
+        form.reset()
+        onAutoLoginSuccess?.()
+        router.push("/dashboard")
+        return
+      }
+    } catch {
+      //network blip or unexpected error — fall through to the manual login fallback
+    }
+
+    //auto-login didn't take. Fall back to the original flow: tell the user the
+    //account exists and let the parent open the login dialog for a manual retry.
+    toast.success("Account created — please log in to continue.", {
+      position: "top-center",
+    })
+    form.reset()
+    onRegisterSuccess?.()
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

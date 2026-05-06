@@ -75,10 +75,16 @@ export function Header() {
                                 <DialogSignin
                                     open={registerOpen}
                                     onOpenChange={setRegisterOpen}
+                                    //fallback: register worked but auto-login failed
+                                    //→ close signup, open login so user can retry
                                     onRegisterSuccess={() => {
                                         setRegisterOpen(false)
                                         setLoginOpen(true)
                                     }}
+                                    //happy path: register + auto-login both worked
+                                    //→ just close signup; navigation to /dashboard
+                                    //  is handled inside the form
+                                    onAutoLoginSuccess={() => setRegisterOpen(false)}
                                 />
                             </>
                         )}
