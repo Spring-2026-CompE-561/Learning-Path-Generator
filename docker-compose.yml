@@ -1,0 +1,88 @@
+# Modern Compose (v2) doesn't need a `version:` field — omitting it
+# uses the latest schema.
+
+services:
+  # ─────────────────────────────────────────────────────────────
+  # PostgreSQL 16 — the database.
+  # On first start it auto-creates POSTGRES_USER + POSTGRES_DB, then
+  # runs anything in /docker-entrypoint-initdb.d/ (our init.sql).
+  # ─────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-learning_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password_123}
+      POSTGRES_DB: ${POSTGRES_DB:-learning_paths}
+    ports:
+      # Publish to host so you can also connect with VS Code's
+      # PostgreSQL extension or `psql` from your Mac.
+      - "5432:5432"
+    volumes:
+      # Named volume → DB data survives `docker compose down`.
+      # To wipe it (e.g. to re-trigger init.sql): `docker compose down -v`
+      - pgdata:/var/lib/postgresql/data
+      # Init script: creates the test database. Read-only mount.
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      # backend's `depends_on` waits for this to pass before starting.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-learning_app} -d ${POSTGRES_DB:-learning_paths}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ─────────────────────────────────────────────────────────────
+  # FastAPI backend — built from backend/Dockerfile.
+  # ─────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      # Loads SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES,
+      # GROQ_API_KEY (and DATABASE_URL, which we override below).
+      - ./backend/.env
+    environment:
+      # Overrides the localhost URL from .env. Inside the container,
+      # "localhost" means the container itself, not your Mac. The DB
+      # is reachable as `db` — that's the service name above.
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-learning_app}:${POSTGRES_PASSWORD:-dev_password_123}@db:5432/${POSTGRES_DB:-learning_paths}
+    ports:
+      - "8000:8000"
+    volumes:
+      # Bind-mount source for hot reload — `fastapi dev` watches files
+      # and reloads on save, even though they live on your Mac.
+      - ./backend:/app
+      # Anonymous volume "shadows" /app/.venv so the host's macOS-built
+      # virtualenv doesn't clobber the container's Linux one.
+      - /app/.venv
+
+  # ─────────────────────────────────────────────────────────────
+  # Next.js frontend — built from frontend/Dockerfile.
+  # ─────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    environment:
+      # Browser-side calls. The browser runs on your Mac, so it sees
+      # the published port at localhost:8000.
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      # Server-side calls (Next SSR / route handlers). These run inside
+      # the frontend container, where the backend is reachable as `backend`.
+      INTERNAL_API_URL: http://backend:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      # Same anonymous-volume trick: keep container's node_modules and
+      # .next build cache instead of inheriting from the host.
+      - /app/node_modules
+      - /app/.next
+
+# Named volume — Docker manages where this lives on disk. Survives
+# container restarts and `docker compose down`. Wipe with `down -v`.
+volumes:
+  pgdata:

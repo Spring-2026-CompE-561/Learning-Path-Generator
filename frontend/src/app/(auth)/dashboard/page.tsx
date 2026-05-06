@@ -16,7 +16,16 @@ export default function Dashboard() {
 
   const fetchPaths = async () => {
     const token = localStorage.getItem("access_token")
+<<<<<<< origin/Cards-test
     if (!token) return
+=======
+
+    // basic guard (for preventing unnecessary request)
+    if (!token) {
+      console.warn("No token found")
+      return
+    }
+>>>>>>> main
 
     setLoading(true)
     try {
@@ -71,6 +80,7 @@ export default function Dashboard() {
             onClick={() => router.push(`/learning-path/${path.id}`)}
             className="p-4 border rounded-xl shadow hover:shadow-md transition cursor-pointer"
           >
+<<<<<<< origin/Cards-test
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <h2 className="text-lg font-semibold truncate">
@@ -93,6 +103,21 @@ export default function Dashboard() {
                 <Trash2 />
               </Button>
             </div>
+=======
+            <h2 className="text-lg font-semibold">
+              {path.topic || "Untitled Topic"}
+            </h2>
+
+            <p className="text-sm text-gray-500">
+              Proficiency: {path.proficency || "N/A"}
+            </p>
+
+           
+
+            <p className="text-sm text-gray-500">
+              Weeks: {path.weeks ?? "N/A"}
+            </p>
+>>>>>>> main
           </div>
         ))}
       </div>

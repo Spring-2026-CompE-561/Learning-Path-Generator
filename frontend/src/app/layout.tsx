@@ -6,6 +6,7 @@ import { Header } from "@/components/ui/header";
 import { Navbar } from "@/components/ui/navbar";
 import {Toaster} from "sonner";
 import { Footer } from "@/components/ui/footer";
+import "./globals.css";
 
 const manrope = Manrope({subsets:['latin'],variable:'--font-sans'});
 

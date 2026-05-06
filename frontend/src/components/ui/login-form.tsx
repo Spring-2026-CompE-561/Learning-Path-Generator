@@ -181,7 +181,7 @@ export function LoginForm({className, onLoginSuccess, ...props
                   )}
               />
               <Field>
-                  <Button type="submit">Login</Button>
+                  <Button type="submit" className="hover:bg-background hover:text-foreground">Login</Button>
                   <FieldDescription className="text-center">
                     Don&apos;t have an account? <a href="#">Sign up</a>
                   </FieldDescription>

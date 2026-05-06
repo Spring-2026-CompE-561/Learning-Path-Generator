@@ -42,6 +42,26 @@ def test_get_by_mail_not_found(db: Session):
     assert user is None
 
 
+def test_get_by_username_exists(db: Session):
+    # should return user if username exists
+    user_db = UserDB(
+        username="testuser",
+        email="test@example.com",
+        hashed_password="hashedpassword123",
+    )
+    UserRepository.create_user(db, user_db)
+
+    user = UserRepository.get_by_username(db, "testuser")
+    assert user is not None
+    assert user.username == "testuser"
+
+
+def test_get_by_username_not_found(db: Session):
+    # should return None if username does not exist
+    user = UserRepository.get_by_username(db, "nonexistent")
+    assert user is None
+
+
 def test_get_by_id_exists(db: Session):
     # should return user if id exists
     user_db = UserDB(

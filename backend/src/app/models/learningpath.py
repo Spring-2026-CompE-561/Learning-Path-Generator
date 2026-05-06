@@ -1,5 +1,5 @@
 # importing from sqlalchemy the data types and things needed for the model
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, JSON, func
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, JSON, func, UniqueConstraint
 
 # links between all the models made
 from sqlalchemy.orm import relationship
@@ -11,6 +11,11 @@ from app.core.database import Base
 class LearningPath(Base):
     __tablename__ = "learning_paths"
 
+    # combo of user_id and topic has to be unique, cant have the same user id and same topic
+    __table_args__ = (
+        UniqueConstraint("user_id", "topic", name="uq_user_topic"),
+    )
+
     # new column named ID, primary key for learning path -> auto increment comes with primary key and every column is required by default
     id = Column(Integer, primary_key=True, index=True)
 
@@ -18,7 +23,7 @@ class LearningPath(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     # setting it for now to a max of 30 characters for topic and making sure its unique and required
-    topic = Column(String(30), unique=True, nullable=False)
+    topic = Column(String(30), nullable=False)
 
     # still debating on using this one
     proficency = Column(String, nullable=True)
