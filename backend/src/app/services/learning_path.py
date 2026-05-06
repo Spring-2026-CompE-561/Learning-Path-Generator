@@ -24,6 +24,17 @@ class LearningPathService:
                 detail="Learning path not found",
             )
         return learning_path
+    
+    def get_by_id_with_details(self, db: Session, learning_path_id: int) -> LearningPath:
+        """Get a learning path by ID, raising 404 if not found."""
+        learning_path = self.repository.get_by_id_with_details(db, learning_path_id)
+        if learning_path is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Learning path not found",
+            )
+        return learning_path
+    
 
     def get_all_by_user(self, db: Session, user_id: int) -> list[LearningPath]:
         """Get all learning paths for a specific user."""
