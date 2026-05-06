@@ -1,7 +1,8 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.learningpath import LearningPath
 from app.schemas.learningpath import LearningPathCreate
+from app.models.weeklyPlan import WeeklyPlan
 
 
 class LearningPathRepository:
@@ -15,6 +16,15 @@ class LearningPathRepository:
         return (
             db.query(LearningPath).filter(LearningPath.id == learning_path_id).first()
         )
+    
+    # joins path and weekly plans and also joins the resources for each plan. Basically fetches path weekly plans and resources for each plan in one query
+    @staticmethod
+    def get_by_id_with_details(db: Session, learning_path_id: int) -> LearningPath | None:
+        """get by id but comes with weekly plans and resources now"""
+        return(db.query(LearningPath).options(joinedload(LearningPath.weekly_plans).joinedload(WeeklyPlan.resources))
+               .filter(LearningPath.id == learning_path_id)
+               .first()
+               )
 
     @staticmethod
     def get_all_by_user(db: Session, user_id: int) -> list[LearningPath]:

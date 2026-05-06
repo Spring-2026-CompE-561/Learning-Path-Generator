@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from typing import Optional, List, Literal
 from datetime import datetime
 
+from app.schemas.weeklyPlan import WeeklyPlanWithResources
+
 
 # this would be things that are used within multiple schemas, think of it like the base for the response and create schemas that will also be created later
 # this will include the
@@ -40,3 +42,7 @@ class LearningPath(LearningPathBase):
 
     # makes it so that pydantic can understand sqlalchemy
     model_config = {"from_attributes": True}
+
+# full learning path response with nested weekly plans
+class LearningPathWithDetails(LearningPath):
+    weekly_plans: List[WeeklyPlanWithResources] = []

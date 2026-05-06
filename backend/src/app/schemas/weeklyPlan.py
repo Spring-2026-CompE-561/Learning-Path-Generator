@@ -4,6 +4,7 @@ This module defines Pydantic Schemas for weekly plans for educational purposes.
 
 from pydantic import BaseModel
 from typing import List
+from app.schemas.resource import Resource
 
 
 class WeeklyPlanBase(BaseModel):
@@ -29,3 +30,8 @@ class WeeklyPlanResponse(WeeklyPlanBase):
     learning_path_id: int
     completion_status: bool = False
     model_config = {"from_attributes": True}
+
+class WeeklyPlanWithResources(WeeklyPlanResponse):
+    """Weekly plan response now with the resource"""
+
+    resources: List[Resource] = []
