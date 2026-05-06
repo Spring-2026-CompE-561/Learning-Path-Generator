@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import * as z from "zod"
 
 import { cn } from "@/lib/utils"
+import { setToken } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -39,6 +40,9 @@ const formSchema = z.object({
             .trim()
             .min(8, "Password must be at least 8 characters")
             .max(10, "Password must be at most 10 characters"),
+  // when true, token persists across browser restarts (localStorage)
+  // when false, token only lives for the current tab (sessionStorage)
+  rememberMe: z.boolean(),
 })
 
 // used to tell the dialog to close after login
@@ -61,6 +65,8 @@ export function LoginForm({className, onLoginSuccess, ...props
     defaultValues: {
       email: "",
       password: "",
+      // default to checked so existing users (who expect persistence) aren't surprised
+      rememberMe: true,
     }
   })
 
@@ -107,7 +113,8 @@ export function LoginForm({className, onLoginSuccess, ...props
     const returnedData = await res.json()
 
     // saves token so other pages can check for it later when doing things
-    localStorage.setItem("access_token", returnedData.access_token)
+    // setToken routes to localStorage or sessionStorage based on the "Remember me" choice
+    setToken(returnedData.access_token, data.rememberMe)
 
     //code to display submited input as JSON in the toast
     toast("You submitted the following values:", {      
@@ -179,6 +186,31 @@ export function LoginForm({className, onLoginSuccess, ...props
 
                   </Field>
                   )}
+              />
+              {/*
+                Remember-me toggle. Controlled via react-hook-form so the value flows
+                into the same submit handler as the other fields. The native checkbox
+                is styled with `accent-primary` to pick up the deep-blue theme color.
+              */}
+              <Controller
+                name="rememberMe"
+                control={form.control}
+                render={({field}) => (
+                  <Field orientation="horizontal">
+                    <input
+                      id="rememberMe"
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={(e) => field.onChange(e.target.checked)}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
+                      className="h-4 w-4 cursor-pointer accent-primary"
+                    />
+                    <FieldLabel htmlFor="rememberMe" className="cursor-pointer text-sm font-normal">
+                      Remember me
+                    </FieldLabel>
+                  </Field>
+                )}
               />
               <Field>
                   <Button type="submit" className="hover:bg-background hover:text-foreground">Login</Button>

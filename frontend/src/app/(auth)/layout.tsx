@@ -4,6 +4,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation";
+import { getToken, clearToken } from "@/lib/auth";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
 
@@ -17,8 +18,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     //if failed, redirect to landing page
     useEffect(() => {
         async function checkAuth(){
-            const token = localStorage.getItem("access_token");
-            
+            const token = getToken();
+
             if(!token){
                 router.replace("/")
                 return;
@@ -34,14 +35,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 });
 
                 if(!res.ok){
-                    localStorage.removeItem("access_toekn");
+                    clearToken();
                     router.replace("/");
                     return;
                 }
 
                 setIsAuthenticated(true);
             } catch (error){
-                localStorage.removeItem("access_token");
+                clearToken();
                 router.replace("/");
             } finally {
                 setLoading(false);

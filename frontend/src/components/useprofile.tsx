@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import * as z from "zod"
 
 import { cn } from "@/lib/utils"
+import { getToken, clearToken } from "@/lib/auth"
 import UserProfile from "@/components/ui/profileIcon"
 
 import { Button } from "@/components/ui/button"
@@ -60,7 +61,7 @@ async function handleDeleteAccount() {
     )
     if (!confirmed) return
 
-    const token = localStorage.getItem("access_token")
+    const token = getToken()
 
     const res = await fetch("http://127.0.0.1:8000/users/me", {
         method: "DELETE",
@@ -81,14 +82,14 @@ async function handleDeleteAccount() {
     })
 
 
-    localStorage.removeItem("access_token")
+    clearToken()
     window.location.href = "/"
 }
 
 //function to log out account
 export async function handleLogOut() {
 
-    const token = localStorage.getItem("access_token")
+    const token = getToken()
 
     const res = await fetch("http://127.0.0.1:8000/users/logout", {
         method: "POST",
@@ -109,7 +110,7 @@ export async function handleLogOut() {
     })
 
 
-    localStorage.removeItem("access_token")
+    clearToken()
     window.location.href = "/"
 }
 
@@ -131,7 +132,7 @@ export function AccountForm({ className, onRegisterSuccess, ...props
     //function to collect user information
     React.useEffect(() => {
         async function getCurrentUser() {
-            const token = localStorage.getItem("access_token")
+            const token = getToken()
             if (!token) {
                 toast.error("no login token found")
                 return
@@ -163,7 +164,7 @@ export function AccountForm({ className, onRegisterSuccess, ...props
 
     //submitting update user information
     async function onSubmit(data: z.infer<typeof formSchema>) {
-        const token = localStorage.getItem("access_token")
+        const token = getToken()
         
         //filtering input data only sending chaning field
         //checking if the field being modify or not

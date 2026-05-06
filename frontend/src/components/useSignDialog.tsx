@@ -16,10 +16,13 @@ import * as React from "react"
 type DialogSigninProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
+  // fires when registration succeeds but auto-login fails — parent should open the login dialog
   onRegisterSuccess?: () => void
+  // fires when registration AND auto-login both succeed — parent should just close this dialog
+  onAutoLoginSuccess?: () => void
 }
 
-export function DialogSignin({ open, onOpenChange, onRegisterSuccess }: DialogSigninProps) {
+export function DialogSignin({ open, onOpenChange, onRegisterSuccess, onAutoLoginSuccess }: DialogSigninProps) {
   return (
     //Dialog component are open
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -32,7 +35,8 @@ export function DialogSignin({ open, onOpenChange, onRegisterSuccess }: DialogSi
             </DialogDescription>
           </DialogHeader>
             <SigninForm
-              onRegisterSuccess = {onRegisterSuccess}/>
+              onRegisterSuccess={onRegisterSuccess}
+              onAutoLoginSuccess={onAutoLoginSuccess} />
         </DialogContent>
     </Dialog>
   )

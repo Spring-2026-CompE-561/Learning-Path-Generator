@@ -4,6 +4,7 @@ import * as React from "react"
 import { useRouter, useParams } from "next/navigation"
 import { Video, FileText, BookOpen, Pencil, Headphones } from "lucide-react"
 import {Button } from "@/components/ui/button"
+import { getToken, clearToken } from "@/lib/auth"
 
 // used for the data that the backend should returm
 
@@ -98,7 +99,7 @@ export default function LearningPathDetail() {
   React.useEffect(() => {
     const fetchPath = async () => {
       // pulls JWT and if no token, not authorized -> go to login
-      const token = localStorage.getItem("access_token")
+      const token = getToken()
       if (!token) {
         router.push("/")
         return
@@ -111,9 +112,9 @@ export default function LearningPathDetail() {
         })
 
         // expired or invalid token
-        if (res.status === 401) 
+        if (res.status === 401)
         {
-          localStorage.removeItem("access_token")
+          clearToken()
           router.push("/")
           return
         }
