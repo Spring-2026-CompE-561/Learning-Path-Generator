@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { usePathname } from 'next/navigation';
 import Link from "next/link";
 import { Menu } from 'lucide-react';
@@ -7,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {Button, buttonVariants } from "@/components/ui/button";
 import { NavigationMenuList } from '@base-ui/react';
 import { cn } from '@/lib/utils';
+import { getToken } from "@/lib/auth";
 
 
 //creating the list of the navbar items
@@ -17,12 +19,32 @@ const NavItems = [
 ];
 
 export function Navbar() {
+    //get current path so we can re-check the token after every navigation
+    //(login redirects from / to /dashboard, logout redirects from any route back to /)
+    const pathname = usePathname();
+
+    //mirror the Header pattern: track auth state in a useState so we can hide
+    //the whole navbar for logged-out visitors. Without this, the Dashboard/
+    //Schedule/Account links sit on the landing page but bounce back via
+    //AuthLayout the moment anyone clicks them — confusing and pointless.
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+    React.useEffect(() => {
+        const sync = () => setIsLoggedIn(!!getToken());
+        sync();
+        //storage event covers cross-tab logout; same-tab login/logout flows
+        //change the pathname which is in this effect's deps
+        window.addEventListener("storage", sync);
+        return () => window.removeEventListener("storage", sync);
+    }, [pathname]);
+
+    if (!isLoggedIn) return null;
+
     return(
         <>
             <DesktopNavbar />
             <MobileNavbar/>
         </>
-        
+
     )
 }
 
