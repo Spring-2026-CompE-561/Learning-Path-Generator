@@ -148,6 +148,7 @@ export function LearningPathForm({ className, onCreateSuccess, ...props }: Learn
                     <FieldLabel htmlFor="proficency">Level</FieldLabel>
                     <Select
                       onValueChange={field.onChange}
+                      value={field.value ?? "beginner"}
                       defaultValue={field.value}
                     >
                       <SelectTrigger id="proficency">
