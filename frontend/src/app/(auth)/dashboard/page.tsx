@@ -68,7 +68,7 @@ export default function Dashboard() {
 
       {loading && <p className="mt-4">Loading...</p>}
 
-      <div className="mt-6 grid gap-4 max-w-3xl">
+      <div className="mt-6 grid gap-4 max-w-3xl bg-background">
         {paths.map((path) => (
           <div
             key={path.id}
@@ -81,10 +81,10 @@ export default function Dashboard() {
                 <h2 className="text-lg font-semibold truncate">
                   {path.topic || "Untitled Topic"}
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary">
                   Proficiency: {path.proficency || "N/A"}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary">
                   Weeks: {path.weeks ?? "N/A"}
                 </p>
               </div>
