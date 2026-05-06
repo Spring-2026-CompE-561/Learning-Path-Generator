@@ -13,7 +13,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
 
     # user.learning_paths to access list of learning paths associated with the user
-    learning_paths = relationship("LearningPath", back_populates="user")
+    learning_paths = relationship("LearningPath", back_populates="user", cascade="all,delete-orphan")
 
     # token version for invalidating tokens when user logs
     token_version = Column(Integer, nullable=False, default=0)

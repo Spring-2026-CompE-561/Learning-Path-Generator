@@ -20,7 +20,7 @@ class LearningPath(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     # user id thats considered the foreign key -> points to users.id which is primary key of users, nullable = false makes it required
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     # setting it for now to a max of 30 characters for topic and making sure its unique and required
     topic = Column(String(30), nullable=False)
