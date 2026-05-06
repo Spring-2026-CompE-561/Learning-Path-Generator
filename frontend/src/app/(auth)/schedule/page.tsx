@@ -2,7 +2,14 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Check } from "lucide-react";
+import {
+  Check,
+  Video,
+  FileText,
+  BookOpen,
+  Pencil,
+  Headphones,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // week starts on monday so that the weekend sits at the end
@@ -16,108 +23,58 @@ const days = [
   "Sunday",
 ];
 
-// shape of one session shown in the calendar
-type ScheduledPath = {
+// shape of a single resource pulled from the weekly plan
+type Resource = {
   id: number;
-  topic: string;
-  task: string;
-  weekNumber: number;
-  totalWeeks: number;
-  completed?: boolean;
+  resource_type: "video" | "audio" | "article" | "problems" | "course";
+  resource_summary: string;
+  url: string;
 };
 
-// fake data for now, swap with the api response later
-// keys are day names so we can look up by day at render time
-const placeholderSchedule: Record<string, ScheduledPath[]> = {
-  Monday: [
-    {
-      id: 1,
-      topic: "React Fundamentals",
-      task: "Watch hooks deep dive video",
-      weekNumber: 2,
-      totalWeeks: 8,
-      completed: true,
-    },
-    {
-      id: 2,
-      topic: "Intro to SQL",
-      task: "Practice SELECT and WHERE clauses",
-      weekNumber: 3,
-      totalWeeks: 6,
-    },
-  ],
-  Tuesday: [
-    {
-      id: 3,
-      topic: "Python for Data Science",
-      task: "Read pandas DataFrame intro",
-      weekNumber: 1,
-      totalWeeks: 10,
-    },
-  ],
-  Wednesday: [
-    {
-      id: 1,
-      topic: "React Fundamentals",
-      task: "Build a counter with useState",
-      weekNumber: 2,
-      totalWeeks: 8,
-    },
-    {
-      id: 4,
-      topic: "System Design Basics",
-      task: "Read about load balancing",
-      weekNumber: 4,
-      totalWeeks: 12,
-      completed: true,
-    },
-  ],
-  Thursday: [
-    {
-      id: 2,
-      topic: "Intro to SQL",
-      task: "JOIN exercises on practice DB",
-      weekNumber: 3,
-      totalWeeks: 6,
-    },
-  ],
-  Friday: [
-    {
-      id: 3,
-      topic: "Python for Data Science",
-      task: "Notebook walkthrough on matplotlib",
-      weekNumber: 1,
-      totalWeeks: 10,
-    },
-    {
-      id: 4,
-      topic: "System Design Basics",
-      task: "Sketch a URL shortener design",
-      weekNumber: 4,
-      totalWeeks: 12,
-    },
-  ],
-  Saturday: [
-    {
-      id: 1,
-      topic: "React Fundamentals",
-      task: "Mini project: todo app",
-      weekNumber: 2,
-      totalWeeks: 8,
-    },
-  ],
-  Sunday: [],
+// one weekly plan, mirrors the learning path detail page
+type WeeklyPlan = {
+  id: number;
+  week_number: number;
+  goal: string[];
+  plan_description: string;
+  completion_status: boolean;
+  resources: Resource[];
+};
+
+// learning path returned from the detail endpoint, with weekly plans nested in
+type LearningPath = {
+  id: number;
+  topic: string;
+  proficency: string | null;
+  weeks: number;
+  created_at: string;
+  weekly_plans: WeeklyPlan[];
+};
+
+// shape of one card slotted into a single day column
+type ScheduledItem = {
+  pathId: number;
+  topic: string;
+  weekNumber: number;
+  totalWeeks: number;
+  resource: Resource;
+  completed: boolean;
 };
 
 // each entry pairs the card styling with a matching progress bar fill
 // each path gets one entry, picked at random on mount
+// static class strings so tailwind picks them up at build time
 const colorPalette = [
-  { card: "border-l-emerald-500 bg-emerald-50/70", fill: "bg-emerald-500" },
-  { card: "border-l-sky-500 bg-sky-50/70", fill: "bg-sky-500" },
-  { card: "border-l-violet-500 bg-violet-50/70", fill: "bg-violet-500" },
-  { card: "border-l-amber-500 bg-amber-50/70", fill: "bg-amber-500" },
-  { card: "border-l-rose-500 bg-rose-50/70", fill: "bg-rose-500" },
-  { card: "border-l-teal-500 bg-teal-50/70", fill: "bg-teal-500" },
+  { card: "border-l-[#1AABDB] bg-[#1AABDB]/10", fill: "bg-[#1AABDB]" }, // sky blue
+  { card: "border-l-[#F5A623] bg-[#F5A623]/10", fill: "bg-[#F5A623]" }, // golden yellow
+  { card: "border-l-[#00BFA5] bg-[#00BFA5]/10", fill: "bg-[#00BFA5]" }, // teal
+  { card: "border-l-[#FF6B6B] bg-[#FF6B6B]/10", fill: "bg-[#FF6B6B]" }, // coral red
+  { card: "border-l-[#7C5CBF] bg-[#7C5CBF]/10", fill: "bg-[#7C5CBF]" }, // purple
+  { card: "border-l-[#4CAF50] bg-[#4CAF50]/10", fill: "bg-[#4CAF50]" }, // green
+  { card: "border-l-[#FF8C42] bg-[#FF8C42]/10", fill: "bg-[#FF8C42]" }, // orange
+  { card: "border-l-[#E91E8C] bg-[#E91E8C]/10", fill: "bg-[#E91E8C]" }, // hot pink
+  { card: "border-l-[#26C6DA] bg-[#26C6DA]/10", fill: "bg-[#26C6DA]" }, // cyan
+  { card: "border-l-[#8D6E63] bg-[#8D6E63]/10", fill: "bg-[#8D6E63]" }, // warm brown
 ];
 
 // shown for the brief moment before the shuffle effect runs
@@ -150,49 +107,232 @@ function shuffle<T>(arr: T[]): T[] {
   return copy;
 }
 
+// matches the icon set used on the learning path detail page
+function ResourceIcon({ type }: { type: Resource["resource_type"] }) {
+  if (type === "video") return <Video className="h-4 w-4" />;
+  if (type === "audio") return <Headphones className="h-4 w-4" />;
+  if (type === "article") return <FileText className="h-4 w-4" />;
+  if (type === "problems") return <Pencil className="h-4 w-4" />;
+  if (type === "course") return <BookOpen className="h-4 w-4" />;
+  return null;
+}
+
+// persisted layout + color picks live here so the schedule does not reshuffle on reload
+// bump the version suffix if the cached shape ever changes
+const STATE_KEY = "schedule_state_v1";
+
+type ScheduleState = {
+  // key is "pathId-weekNumber", value is the day index for each resource in that week
+  layouts: Record<string, number[]>;
+  // pathId to index into colorPalette
+  colors: Record<number, number>;
+};
+
+function loadState(): ScheduleState {
+  if (typeof window === "undefined") return { layouts: {}, colors: {} };
+  try {
+    const raw = window.localStorage.getItem(STATE_KEY);
+    if (!raw) return { layouts: {}, colors: {} };
+    const parsed = JSON.parse(raw);
+    return {
+      layouts: parsed.layouts ?? {},
+      colors: parsed.colors ?? {},
+    };
+  } catch {
+    return { layouts: {}, colors: {} };
+  }
+}
+
+function saveState(state: ScheduleState) {
+  try {
+    window.localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  } catch {
+    // out of quota or disabled storage, just skip persistence
+  }
+}
+
+// figure out which day columns this path's resources should land in
+// few resources scatter randomly so they do not bunch up at the start of the week
+// many resources spread across the whole week with even spacing
+function pickDayIndices(numResources: number, totalDays: number): number[] {
+  if (numResources <= 0) return [];
+  if (numResources >= totalDays) {
+    return Array.from({ length: totalDays }, (_, i) => i);
+  }
+  if (numResources <= 3) {
+    // shuffle 0..6, take n, sort so resource order maps to chronological days
+    const all = Array.from({ length: totalDays }, (_, i) => i);
+    return shuffle(all)
+      .slice(0, numResources)
+      .sort((a, b) => a - b);
+  }
+  // for 4+ resources, place them at evenly spaced positions across the week
+  const step = (totalDays - 1) / (numResources - 1);
+  return Array.from({ length: numResources }, (_, i) => Math.round(i * step));
+}
+
+// derive which week of the path the user is on right now from created_at
+// clamped to the path length so finished paths stop at the final week
+function currentWeekNumber(path: LearningPath): number {
+  const created = new Date(path.created_at).getTime();
+  const now = Date.now();
+  const elapsedDays = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+  const week = Math.floor(elapsedDays / 7) + 1;
+  if (week < 1) return 1;
+  if (week > path.weeks) return path.weeks;
+  return week;
+}
+
 export default function Schedule() {
   const router = useRouter();
 
   // name of the current weekday, used to highlight the matching column
   const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
 
-  // every distinct path id that appears anywhere in the schedule
-  // sorted so the color assignment stays stable across days
-  const uniquePathIds = React.useMemo(
-    () =>
-      Array.from(
-        new Set(
-          Object.values(placeholderSchedule).flatMap((items) =>
-            items.map((i) => i.id)
-          )
-        )
-      ).sort((a, b) => a - b),
-    []
-  );
+  // schedule grouped by day name, populated from the api
+  const [schedule, setSchedule] = React.useState<
+    Record<string, ScheduledItem[]>
+  >(() => Object.fromEntries(days.map((d) => [d, [] as ScheduledItem[]])));
 
-  // path id to color mapping, filled in by the effect below
-  const [colorMap, setColorMap] = React.useState<
-    Record<number, (typeof colorPalette)[number]>
-  >({});
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   // start with the first phrase so server and client render the same html
   // the effect swaps in a random pick right after hydration
   const [subtitle, setSubtitle] = React.useState(subtitlePhrases[0]);
 
-  // runs once after mount, sets up colors and the rotating subtitle
-  React.useEffect(() => {
-    const shuffled = shuffle(colorPalette);
-    const map: Record<number, (typeof colorPalette)[number]> = {};
-    uniquePathIds.forEach((id, idx) => {
-      // modulo so we recycle colors when there are more paths than palette entries
-      map[id] = shuffled[idx % shuffled.length];
-    });
-    setColorMap(map);
+  // path id to color mapping, filled in once the data lands
+  const [colorMap, setColorMap] = React.useState<
+    Record<number, (typeof colorPalette)[number]>
+  >({});
 
+  // pull the schedule from the backend on mount
+  React.useEffect(() => {
+    const fetchSchedule = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        router.push("/");
+        return;
+      }
+
+      try {
+        // step 1, list every learning path the user owns
+        const listRes = await fetch("http://127.0.0.1:8000/learning-paths/", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (listRes.status === 401) {
+          localStorage.removeItem("access_token");
+          router.push("/");
+          return;
+        }
+        if (!listRes.ok) throw new Error("Failed to fetch learning paths");
+        const list: LearningPath[] = await listRes.json();
+
+        // step 2, fan out to the detail endpoint so we get weekly plans + resources
+        const detailed = await Promise.all(
+          list.map(async (p) => {
+            const res = await fetch(
+              `http://127.0.0.1:8000/learning-paths/${p.id}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (!res.ok) return null;
+            return (await res.json()) as LearningPath;
+          })
+        );
+
+        // step 3, drop one resource per day so each card has a single task
+        const next: Record<string, ScheduledItem[]> = Object.fromEntries(
+          days.map((d) => [d, [] as ScheduledItem[]])
+        );
+
+        // pull whatever we saved on a previous visit so the layout stays stable
+        const saved = loadState();
+        const layouts: Record<string, number[]> = { ...saved.layouts };
+        const colors: Record<number, number> = { ...saved.colors };
+
+        detailed.forEach((path) => {
+          if (!path) return;
+          const wkNum = currentWeekNumber(path);
+          const plan = path.weekly_plans.find((w) => w.week_number === wkNum);
+          if (!plan) return;
+
+          // single resource per day, capped at seven so we never overflow the week
+          const resources = plan.resources.slice(0, days.length);
+          const layoutKey = `${path.id}-${plan.week_number}`;
+
+          // reuse the saved slot positions, only regenerate when we have nothing or
+          // the resource count has changed since last time (eg. plan was regenerated)
+          let slots = layouts[layoutKey];
+          if (!slots || slots.length !== resources.length) {
+            slots = pickDayIndices(resources.length, days.length);
+            layouts[layoutKey] = slots;
+          }
+
+          resources.forEach((resource, i) => {
+            const day = days[slots[i]];
+            next[day].push({
+              pathId: path.id,
+              topic: path.topic,
+              weekNumber: plan.week_number,
+              totalWeeks: path.weeks,
+              resource,
+              completed: plan.completion_status,
+            });
+          });
+        });
+
+        // assign a stable color to each path, reusing saved picks when present
+        const uniquePathIds = Array.from(
+          new Set(
+            Object.values(next).flatMap((items) => items.map((i) => i.pathId))
+          )
+        ).sort((a, b) => a - b);
+
+        // track which palette slots are already taken so new paths prefer unused colors
+        const usedIndices = new Set<number>();
+        uniquePathIds.forEach((id) => {
+          if (typeof colors[id] === "number") {
+            usedIndices.add(colors[id]);
+          }
+        });
+
+        const map: Record<number, (typeof colorPalette)[number]> = {};
+        uniquePathIds.forEach((id) => {
+          if (typeof colors[id] !== "number") {
+            // pick from unused palette slots first, fall back to any when all are taken
+            const free = colorPalette
+              .map((_, idx) => idx)
+              .filter((idx) => !usedIndices.has(idx));
+            const pick =
+              free.length > 0
+                ? free[Math.floor(Math.random() * free.length)]
+                : Math.floor(Math.random() * colorPalette.length);
+            colors[id] = pick;
+            usedIndices.add(pick);
+          }
+          map[id] = colorPalette[colors[id]];
+        });
+
+        // persist so the next reload sees the same layout + colors
+        saveState({ layouts, colors });
+
+        setSchedule(next);
+        setColorMap(map);
+      } catch (err) {
+        console.error("Error fetching schedule:", err);
+        setError("Could not load schedule. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchedule();
+
+    // pick a fresh subtitle on every mount so the page feels alive
     setSubtitle(
       subtitlePhrases[Math.floor(Math.random() * subtitlePhrases.length)]
     );
-  }, [uniquePathIds]);
+  }, [router]);
 
   // tiny helper so the JSX below stays readable
   const colorFor = (id: number) => colorMap[id] ?? fallbackColor;
@@ -203,10 +343,13 @@ export default function Schedule() {
       <h1 className="text-2xl font-bold">Schedule</h1>
       <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
 
+      {loading && <p className="mt-6 text-sm text-gray-500">Loading...</p>}
+      {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
+
       {/* one column per day at desktop, collapses to two then one on smaller screens */}
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7">
         {days.map((day, idx) => {
-          const items = placeholderSchedule[day] ?? [];
+          const items = schedule[day] ?? [];
           const isToday = day === today;
           const isLast = idx === days.length - 1;
 
@@ -244,54 +387,65 @@ export default function Schedule() {
                   <p className="text-sm text-gray-400">Rest day</p>
                 </div>
               ) : (
-                items.map((path) => {
+                items.map((item) => {
                   // same path id resolves to the same color across every day
-                  const color = colorFor(path.id);
+                  const color = colorFor(item.pathId);
                   // clamp to 100 so an off by one in real data does not break the bar
                   const pct = Math.min(
                     100,
-                    Math.round((path.weekNumber / path.totalWeeks) * 100)
+                    Math.round((item.weekNumber / item.totalWeeks) * 100)
                   );
 
                   return (
-                    // clicking a card jumps to the learning path detail page
+                    // clicking the card jumps to the learning path detail page
                     <div
-                      key={`${day}-${path.id}`}
-                      onClick={() => router.push(`/learning-path/${path.id}`)}
+                      key={`${day}-${item.pathId}-${item.resource.id}`}
+                      onClick={() =>
+                        router.push(`/learning-path/${item.pathId}`)
+                      }
                       className={cn(
                         "p-4 border border-l-4 rounded-xl shadow hover:shadow-md transition cursor-pointer",
                         color.card,
-                        // faded look when the session is already done
-                        path.completed && "opacity-60"
+                        // faded look when the week is already done
+                        item.completed && "opacity-60"
                       )}
                     >
-                      {/* topic title with a check icon when the session is complete */}
+                      {/* topic title with a check icon when the week is complete */}
                       <div className="flex items-start gap-1.5">
                         <h3
                           className="text-base font-semibold text-gray-900 truncate flex-1"
-                          title={path.topic}
+                          title={item.topic}
                         >
-                          {path.topic}
+                          {item.topic}
                         </h3>
-                        {path.completed && (
+                        {item.completed && (
                           <Check className="h-4 w-4 shrink-0 text-emerald-600" />
                         )}
                       </div>
 
-                      {/* what to study today, struck through when it has been done */}
-                      <p
+                      {/* the single resource for the day, clickable straight through to the source */}
+                      <a
+                        href={item.resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
                         className={cn(
-                          "mt-1 text-sm text-gray-600",
-                          path.completed && "line-through"
+                          "mt-2 flex items-start gap-2 text-sm text-gray-700 hover:text-blue-600 hover:underline",
+                          item.completed && "line-through"
                         )}
                       >
-                        {path.task}
-                      </p>
+                        <span className="mt-0.5 shrink-0 text-gray-500">
+                          <ResourceIcon type={item.resource.resource_type} />
+                        </span>
+                        <span className="line-clamp-3">
+                          {item.resource.resource_summary}
+                        </span>
+                      </a>
 
                       {/* week label and progress bar */}
                       <div className="mt-3">
                         <p className="text-xs text-gray-500 mb-1">
-                          Week {path.weekNumber} of {path.totalWeeks}
+                          Week {item.weekNumber} of {item.totalWeeks}
                         </p>
                         <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
                           {/* fill width tracks how far along the user is in the path */}
