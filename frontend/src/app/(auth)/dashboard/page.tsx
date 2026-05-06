@@ -68,12 +68,15 @@ export default function Dashboard() {
 
       {loading && <p className="mt-4">Loading...</p>}
 
-      <div className="mt-6 grid gap-4 max-w-3xl bg-background">
+      <div className="mt-6 grid gap-4 max-w-3xl">
         {paths.map((path) => (
           <div
             key={path.id}
             onClick={() => router.push(`/learning-path/${path.id}`)}
-            className="p-4 border rounded-xl shadow hover:shadow-md transition cursor-pointer"
+            className="p-4 border 
+            rounded-xl shadow hover:shadow-md 
+            transition cursor-pointer
+            bg-background hover:bg-primary"
           >
 
             <div className="flex items-start justify-between gap-4">
