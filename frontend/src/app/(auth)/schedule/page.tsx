@@ -373,7 +373,7 @@ export default function Schedule() {
       {/* heading on the left, week selector on the right */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Schedule</h1>
+          <h1 className="text-2xl font-bold text-primary">Schedule</h1>
           <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
         </div>
 
@@ -382,7 +382,7 @@ export default function Schedule() {
           value={String(weekOffset)}
           onValueChange={(v) => setWeekOffset(Number(v))}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] text-primary">
             {/* base ui's SelectValue defaults to the raw value, render the label instead */}
             <SelectValue>
               {(value: string) => weekOffsetLabels[value] ?? "This week"}

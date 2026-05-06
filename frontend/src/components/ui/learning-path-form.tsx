@@ -191,7 +191,7 @@ export function LearningPathForm({ className, onCreateSuccess, ...props }: Learn
 
               {/* submit button */}
               <Field>
-                <Button type="submit" disabled={isLoading}>
+                <Button className="hover:bg-background hover:text-foreground"type="submit" disabled={isLoading}>
                   {isLoading ? "Generating with AI..." : "Create Learning Path"}
                 </Button>
               </Field>

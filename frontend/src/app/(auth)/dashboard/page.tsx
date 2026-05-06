@@ -73,7 +73,10 @@ export default function Dashboard() {
           <div
             key={path.id}
             onClick={() => router.push(`/learning-path/${path.id}`)}
-            className="p-4 border rounded-xl shadow hover:shadow-md transition cursor-pointer"
+            className="p-4 border 
+            rounded-xl shadow hover:shadow-md 
+            transition cursor-pointer
+            bg-background hover:bg-primary"
           >
 
             <div className="flex items-start justify-between gap-4">
@@ -81,10 +84,10 @@ export default function Dashboard() {
                 <h2 className="text-lg font-semibold truncate">
                   {path.topic || "Untitled Topic"}
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary">
                   Proficiency: {path.proficency || "N/A"}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-secondary">
                   Weeks: {path.weeks ?? "N/A"}
                 </p>
               </div>

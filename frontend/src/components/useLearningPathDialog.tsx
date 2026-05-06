@@ -23,7 +23,7 @@ export function LearningPathDialog({ open, onOpenChange, showTrigger = true }: L
     <Dialog open={open} onOpenChange={onOpenChange}>
       {showTrigger && (
         <DialogTrigger render={
-          <Button variant="outline">
+          <Button variant="outline" className="bg-primary hover:bg-background">
             <Plus className="mr-2 h-4 w-4" />
             Create Learning Path
           </Button>
