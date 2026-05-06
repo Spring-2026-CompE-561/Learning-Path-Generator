@@ -1,0 +1,229 @@
+"use client"
+
+import * as React from "react"
+import { useRouter, useParams } from "next/navigation"
+import { Video, FileText, BookOpen, Pencil, Headphones } from "lucide-react"
+import {Button } from "@/components/ui/button"
+
+// used for the data that the backend should returm
+
+// this would be one resource for a weekly plan
+type Resource = {
+    // id for resource, type of resource, the simmary of the resource itself, and the URL -> or search
+  id: number
+  resource_type: "video" | "audio" | "article" | "problems" | "course"
+  resource_summary: string
+  url: string
+}
+
+
+// a singular week of the learning path
+type WeeklyPlan = {
+    // id, week number, goal, the description of the week, and completion -> lowk probably not gonna use
+  id: number
+  week_number: number
+  goal: string[]
+  plan_description: string
+  completion_status: boolean
+  resources: Resource[]
+}
+
+// Learning path 
+type LearningPath = {
+    // info about the learning path 
+  id: number
+  topic: string
+  proficency: string | null
+  weeks: number
+  created_at: string
+  weekly_plans: WeeklyPlan[]
+}
+// gives an icon depending on the type of resouce
+function ResourceIcon({ type }: { type: Resource["resource_type"] }) {
+
+  // icon for vid
+  if (type === "video")
+  {
+    return <Video className="h-4 w-4" />
+  } 
+
+  // icon for audio
+  if (type === "audio")
+  {
+    return <Headphones className="h-4 w-4" />
+  } 
+
+  // icon for article
+  if (type === "article")
+  {
+    return <FileText className="h-4 w-4" />
+  } 
+
+  // problems
+  if (type === "problems")
+  {
+    return <Pencil className="h-4 w-4" />
+  } 
+
+  // courses
+  if (type === "course")
+  {
+    return <BookOpen className="h-4 w-4" />
+  } 
+
+  // if its not one of the types idk how but return nothing
+  return null
+}
+
+
+// loads when user clicks card on dashboard
+export default function LearningPathDetail() {
+
+  // help with navi to dashboard
+  const router = useRouter()
+
+  // grabs id from url
+  const params = useParams<{ id: string }>()
+
+  // holds fetched data
+  const [path, setPath] = React.useState<LearningPath | null>(null)
+
+  // loading until done ffetching
+  const [loading, setLoading] = React.useState(true)
+
+  // message if soemthing fails
+  const [error, setError] = React.useState<string | null>(null)
+
+  // fetch learning path
+  React.useEffect(() => {
+    const fetchPath = async () => {
+      // pulls JWT and if no token, not authorized -> go to login
+      const token = localStorage.getItem("access_token")
+      if (!token) {
+        router.push("/")
+        return
+      }
+
+      // get
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/learning-paths/${params.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+        // expired or invalid token
+        if (res.status === 401) 
+        {
+          localStorage.removeItem("access_token")
+          router.push("/")
+          return
+        }
+
+        // path id doesnt exist or doesnt belong to user = 404
+        if (res.status === 404) 
+        {
+          setError("Learning path not found")
+          return
+        }
+
+        if (!res.ok)
+        {
+          throw new Error("Failed to fetch learning path")
+        }
+
+        const data: LearningPath = await res.json()
+        setPath(data)
+      } catch (err) {
+        console.error("Error fetching path:", err)
+        setError("Could not load learning path. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    // actually fetch 
+    fetchPath()
+  }, [params.id, router])
+
+  // if still fetching then loading message
+  if (loading) 
+  {
+    return <p className="p-8">Loading...</p>
+  }
+
+  // error = error with back buttom
+  if (error) 
+  {
+    return (
+      <div className="p-8">
+        <Button variant="ghost" onClick={() => router.push("/dashboard")}>
+          ← Back to dashboard
+        </Button>
+        <p className="mt-4">{error}</p>
+      </div>
+    )
+  }
+
+  if (!path) 
+  {
+    return null
+  }
+  return (
+    <div className="p-8 max-w-4xl mx-auto">
+      {/* back link to dashboard */}
+      <Button variant="ghost" onClick={() => router.push("/dashboard")} className="mb-6">
+        ← Back to dashboard
+      </Button>
+
+      {/* path header, topic, proficency, and weeks */}
+      <h1 className="text-3xl font-bold">{path.topic}</h1>
+      <p className="text-gray-500 mt-1">
+        {path.proficency || "N/A"} • {path.weeks} weeks
+      </p>
+
+      <hr className="my-6" />
+
+      {/* one section per weekly plan same as dashboard card pattern */}
+      <div className="space-y-6">
+        {path.weekly_plans.map((plan) => (
+          <div key={plan.id} className="p-6 border rounded-xl shadow hover:shadow-md transition">
+            <h2 className="text-xl font-semibold">Week {plan.week_number}</h2>
+            <p className="text-gray-700 mt-2">{plan.plan_description}</p>
+
+            {/* goals list -> goals generated by the AI for the week*/}
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-gray-700">Goals</h3>
+              <ul className="list-disc list-inside mt-1 text-sm text-gray-700">
+                {plan.goal.map((g, idx) => (
+                  <li key={idx}>{g}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* resources list -> 3-5 resources a week*/}
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-gray-700">Resources</h3>
+              <ul className="mt-2 space-y-2">
+                {plan.resources.map((resource) => (
+                  <li key={resource.id} className="flex items-start gap-2">
+                    <span className="mt-1 text-gray-500">
+                      <ResourceIcon type={resource.resource_type} />
+                    </span>
+                    <a
+                    
+                      href={resource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      {resource.resource_summary}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}

@@ -6,6 +6,7 @@ from app.services.learning_path import learning_path_service
 from app.schemas.learningpath import (
     LearningPathCreate,
     LearningPath as LearningPathSchema,
+    LearningPathWithDetails
 )
 from app.models.user import User as UserModel
 from app.services.user import user_service
@@ -40,13 +41,13 @@ def get_all(
 """Get by specific id, Todo:(can implement security check if needed)"""
 
 
-@api_router.get("/{learning_path_id}", response_model=LearningPathSchema)
+@api_router.get("/{learning_path_id}", response_model=LearningPathWithDetails)
 def get_using_specfic(
     learning_path_id: int,
     db: Session = Depends(get_db),
     current_user: UserModel = Depends(user_service.get_current_user),
 ):
-    return learning_path_service.get_by_id(db, learning_path_id)
+    return learning_path_service.get_by_id_with_details(db, learning_path_id)
 
 
 """Update learning path, Todo:(can change updates if schema is updated)"""
