@@ -119,7 +119,7 @@ function NavbarItem({ link, label, clickCallBack }: Readonly<navItemsProps>) {
                 href={link}
                 className={cn(
                     buttonVariants({variant: "ghost" }),
-                        "w-full justify-start text-xl text-muted-foreground hover:text-foreground",
+                        "w-full justify-start text-xl text-foreground hover:text-foreground",
                     isActive && "text-foreground",
                 )}
                 onClick={() => {
