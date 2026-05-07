@@ -51,8 +51,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         }
         
         checkAuth();
-        setLoading(false);
-    }, [router]); 
+        // setLoading(false) lives in checkAuth's `finally` — calling it here
+        // would race ahead of the /users/me fetch and flash the unauth UI
+    }, [router]);
     
     //Consider removing this in real implementation
     if(loading) {

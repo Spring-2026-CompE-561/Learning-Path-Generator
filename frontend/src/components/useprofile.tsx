@@ -55,6 +55,9 @@ type SigninFormProps = React.ComponentProps<"div"> & {
 }
 
 //function to delete account
+//mirrors handleLogOut: backend call is best-effort, local cleanup is mandatory.
+//if the token's already expired, the DELETE returns 401 — we still wipe
+//credentials locally so the user isn't trapped with a dead session.
 async function handleDeleteAccount() {
     const confirmed = window.confirm(
         "Are you sure you want to delete your account? this action cannot be undone"
@@ -62,53 +65,61 @@ async function handleDeleteAccount() {
     if (!confirmed) return
 
     const token = getToken()
+    let backendOk = false
 
-    const res = await fetch("http://127.0.0.1:8000/users/me", {
-        method: "DELETE",
-        headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-        }
-    })
-
-    if (!res.ok) {
-        toast.error("Failed to delete Account", {
-            position: "top-center"
+    try {
+        const res = await fetch("http://127.0.0.1:8000/users/me", {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`,
+            }
         })
-        return
+        backendOk = res.ok
+    } catch {
+        // network blip — fall through to local cleanup
     }
-    toast.success("Account deleted successfully", {
-        position: "top-center",
-    })
 
+    if (backendOk) {
+        toast.success("Account deleted successfully", { position: "top-center" })
+    } else {
+        // server-side delete didn't go through. flag it so the user knows the
+        // record may still exist, but we've at least logged them out locally.
+        toast.error(
+            "Could not delete account on the server, but you've been logged out. Please contact support if the account still exists.",
+            { position: "top-center" }
+        )
+    }
 
     clearToken()
     window.location.href = "/"
 }
 
 //function to log out account
+//backend revocation is best-effort; we always clear the local token and
+//redirect, otherwise an expired/invalid token leaves the user stuck (the
+//server keeps returning 401, the function would bail before clearing).
 export async function handleLogOut() {
-
     const token = getToken()
 
-    const res = await fetch("http://127.0.0.1:8000/users/logout", {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-        }
-    })
-
-    if (!res.ok) {
-        toast.error("Failed to Log Out", {
-            position: "top-center"
+    try {
+        const res = await fetch("http://127.0.0.1:8000/users/logout", {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                Authorization: `Bearer ${token}`,
+            }
         })
-        return
+        if (res.ok) {
+            toast.success("Log Out successfully", { position: "top-center" })
+        } else {
+            // token was probably already expired — that's fine, log out locally anyway
+            toast.message("Logged out", { position: "top-center" })
+        }
+    } catch {
+        // network blip / backend down — still wipe local credentials
+        toast.message("Logged out", { position: "top-center" })
     }
-    toast.success("Log Out successfully", {
-        position: "top-center",
-    })
-
 
     clearToken()
     window.location.href = "/"
