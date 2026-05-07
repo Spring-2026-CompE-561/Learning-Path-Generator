@@ -1,11 +1,6 @@
 "use client";
-import { MeteorsDemo } from "@/components/meteor";
+import { LandingHero } from "@/components/landing-hero";
 
 export default function Home() {
-  return (
-
-      <MeteorsDemo />
-    
-    
-  );
+  return <LandingHero />;
 }
