@@ -28,7 +28,17 @@ export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLo
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
         {showTrigger && (
-          <DialogTrigger render={<Button variant="outline">Login</Button>} />
+          <DialogTrigger
+            render={
+              <Button
+                variant="outline"
+                // filled blue + white text in both modes; lighter shade in dark for contrast on gray-900
+                className="border-2 border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 hover:text-white dark:border-blue-500 dark:bg-blue-500 dark:hover:border-blue-400 dark:hover:bg-blue-400"
+              >
+                Login
+              </Button>
+            }
+          />
         )}
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>

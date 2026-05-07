@@ -3,6 +3,7 @@
 import * as React from "react"
 import { Sparkles, ArrowRight, Play } from "lucide-react"
 import { Meteors } from "@/components/ui/meteors"
+import { OrigamiPlanes } from "@/components/ui/origami-planes"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
@@ -74,7 +75,7 @@ function ResultCard({ outline }: { outline: Outline }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="text-xs uppercase tracking-wider text-slate-400">{outline.topic}</div>
+      <div className="text-xs uppercase tracking-wider text-gray-600 dark:text-slate-400">{outline.topic}</div>
       {outline.weeks.map((w, idx) => {
         if (idx > activeIdx) return null
         const isActive = idx === activeIdx
@@ -87,18 +88,18 @@ function ResultCard({ outline }: { outline: Outline }) {
           <div
             key={`${outline.topic}-${w.week}`}
             className={cn(
-              "rounded-lg border border-white/10 bg-white/5 p-4 transition-opacity",
+              "rounded-lg border border-foreground/10 bg-white/60 p-4 transition-opacity dark:border-white/10 dark:bg-white/5",
               isPast && "opacity-70"
             )}
           >
-            <div className="font-semibold text-white">
+            <div className="font-semibold text-gray-900 dark:text-white">
               {titleDisplay}
-              <span className="text-sky-300">{cursor}</span>
+              <span className="text-primary dark:text-sky-300">{cursor}</span>
             </div>
-            <ul className="mt-2 space-y-1 text-sm text-slate-300">
+            <ul className="mt-2 space-y-1 text-sm text-gray-700 dark:text-slate-300">
               {w.bullets.slice(0, bulletCount).map((b, i) => (
                 <li key={i} className="flex gap-2">
-                  <span className="text-sky-400">·</span>
+                  <span className="text-primary dark:text-sky-400">·</span>
                   <span>{b}</span>
                 </li>
               ))}
@@ -126,28 +127,40 @@ export function LandingHero() {
 
   return (
     <>
-      {/* HERO — full-width dark backdrop with meteors behind centered content */}
-      <section className="relative w-full overflow-hidden bg-gray-900">
-        <div className="absolute inset-0">
+      {/* HERO
+            light: beige cream gradient + drifting origami planes (blue + yellow)
+            dark:  gray-900 + meteor shower (unchanged from previous design)
+          backdrops both render but `dark:hidden` / `hidden dark:block` swaps
+          which one is visible — keeps the theme switch smooth without a flash. */}
+      <section className="relative w-full overflow-hidden bg-amber-50 dark:bg-gray-900">
+        {/* light-mode origami planes */}
+        <div className="absolute inset-0 dark:hidden">
+          <OrigamiPlanes number={14} />
+        </div>
+        {/* dark-mode meteors */}
+        <div className="absolute inset-0 hidden dark:block">
           <Meteors number={30} />
         </div>
-        {/* soft blue/teal glow under the content for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-teal-500/10" />
+        {/* glow overlay; dark mode keeps the blue/teal tint, light mode is invisible */}
+        <div className="absolute inset-0 hidden dark:block bg-gradient-to-b from-blue-500/10 via-transparent to-teal-500/10" />
 
         <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-6 py-24 text-center sm:py-32">
-          {/* pill badge */}
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm text-slate-200 backdrop-blur-sm">
-            <Sparkles className="h-3.5 w-3.5 text-yellow-300" />
+          {/* pill badge — white floating chip in light, translucent in dark */}
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-white/80 px-4 py-1.5 text-sm text-gray-700 shadow-sm backdrop-blur-sm dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:shadow-none">
+            <Sparkles className="h-3.5 w-3.5 text-primary dark:text-yellow-300" />
             <span>AI-curated learning paths</span>
           </div>
 
-          {/* headline split white + golden, mirroring the mockup */}
-          <h1 className="text-5xl font-bold leading-tight text-white sm:text-6xl">
+          {/* headline — line 1 dark in light mode / white in dark; line 2 is a
+              blue→yellow gradient in light, plain golden yellow in dark */}
+          <h1 className="text-5xl font-bold leading-tight text-gray-900 sm:text-6xl dark:text-white">
             Your goal. Your progress.<br />
-            <span className="text-yellow-300">Powered by AI.</span>
+            <span className="bg-gradient-to-r from-primary to-yellow-500 bg-clip-text text-transparent dark:from-yellow-300 dark:to-yellow-300">
+              Powered by AI.
+            </span>
           </h1>
 
-          <p className="mt-6 max-w-2xl text-lg text-slate-300">
+          <p className="mt-6 max-w-2xl text-lg text-gray-700 dark:text-slate-300">
             Tell us what you want to learn and we&apos;ll build a personalized
             week-by-week plan with curated resources for every stage.
           </p>
@@ -157,10 +170,12 @@ export function LandingHero() {
               size="lg"
               onClick={handleGenerate}
               className={cn(
-                "rounded-full bg-yellow-300 px-6 text-base font-semibold text-gray-900",
-                "hover:bg-yellow-200 hover:text-gray-900",
-                "shadow-[0_0_24px_rgba(247,203,45,0.4)] transition-shadow",
-                "hover:shadow-[0_0_36px_rgba(247,203,45,0.65)]"
+                "rounded-full bg-blue-700 px-6 text-base font-semibold text-white",
+                "hover:bg-blue-800 hover:text-white",
+                // blue glow that intensifies on hover
+                "shadow-[0_0_24px_rgba(13,101,157,0.4)] transition-shadow",
+                "hover:shadow-[0_0_36px_rgba(13,101,157,0.65)]",
+                "dark:bg-blue-500 dark:hover:bg-blue-400"
               )}
             >
               Generate my path
@@ -170,9 +185,9 @@ export function LandingHero() {
               size="lg"
               variant="outline"
               onClick={handleSeeSample}
-              className="rounded-full border-white/20 bg-white/5 px-6 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/10 hover:text-white"
+              className="rounded-full border-gray-300 bg-white px-6 text-base font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-900 dark:border-white/20 dark:bg-white/5 dark:text-white dark:backdrop-blur-sm dark:hover:bg-white/10 dark:hover:text-white"
             >
-              <Play className="mr-2 h-4 w-4 fill-white" />
+              <Play className="mr-2 h-4 w-4 fill-current" />
               See a sample plan
             </Button>
           </div>
@@ -180,25 +195,26 @@ export function LandingHero() {
       </section>
 
       {/* SAMPLE PLAN SECTION — scroll target for the secondary CTA */}
-      <section ref={sampleRef} className="relative w-full bg-gray-900 px-6 py-20">
-        {/* subtle gradient so the sample reads as a distinct section */}
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-950 to-gray-900" />
+      <section ref={sampleRef} className="relative w-full bg-amber-50 px-6 py-20 dark:bg-gray-900">
+        {/* dark-mode tint so the sample reads as distinct from the hero above */}
+        <div className="absolute inset-0 hidden dark:block bg-gradient-to-b from-gray-900 via-gray-950 to-gray-900" />
 
         <div className="relative z-10 mx-auto max-w-2xl">
           <div className="mb-2 flex items-center justify-center gap-2">
-            <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-            <span className="text-xs uppercase tracking-wider text-slate-400">
+            <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 dark:bg-emerald-400" />
+            <span className="text-xs uppercase tracking-wider text-gray-600 dark:text-slate-400">
               Sample plan, generating in real time
             </span>
           </div>
-          <h2 className="mb-2 text-center text-3xl font-bold text-white">
+          <h2 className="mb-2 text-center text-3xl font-bold text-gray-900 dark:text-white">
             What a path looks like
           </h2>
-          <p className="mb-10 text-center text-slate-400">
+          <p className="mb-10 text-center text-gray-600 dark:text-slate-400">
             A peek at the kind of week-by-week breakdown you&apos;ll get.
           </p>
 
-          <div className="rounded-2xl border border-white/10 bg-gray-900/70 p-6 backdrop-blur-md">
+          {/* card uses light glass in light mode, dark glass in dark */}
+          <div className="rounded-2xl border border-foreground/10 bg-white/70 p-6 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-gray-900/70 dark:shadow-none">
             <ResultCard outline={sampleOutline} />
           </div>
         </div>

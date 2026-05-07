@@ -26,7 +26,17 @@ export function DialogSignin({ open, onOpenChange, onRegisterSuccess, onAutoLogi
   return (
     //Dialog component are open
     <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogTrigger render={<Button variant="outline">Sign Up</Button>} />
+        <DialogTrigger
+          render={
+            <Button
+              variant="outline"
+              // filled blue + white text — matches Login + Generate my path
+              className="border-2 border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 hover:text-white dark:border-blue-500 dark:bg-blue-500 dark:hover:border-blue-400 dark:hover:bg-blue-400"
+            >
+              Sign Up
+            </Button>
+          }
+        />
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>Create your LearningPath Account</DialogTitle>

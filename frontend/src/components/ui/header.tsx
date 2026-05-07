@@ -8,6 +8,7 @@ import { handleLogOut } from "@/components/useprofile";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Meteors } from "@/components/ui/meteors";
+import { OrigamiPlanes } from "@/components/ui/origami-planes";
 import { getToken } from "@/lib/auth";
 import * as React from "react";
 
@@ -46,18 +47,23 @@ export function Header() {
     }, [])
 
     //special case for landing page
-    //bg-gray-900 + a meteor shower so the header and hero read as one continuous
-    //starfield instead of showing a seam between two different dark shades.
+    //  light: beige cream gradient + drifting origami planes
+    //  dark:  gray-900 + meteor shower
+    //both modes share the layout so the header reads continuously with the hero
     if (pathname === '/'){
         return (
-            <header className="relative w-full h-fit overflow-hidden bg-gray-900 text-white">
-                {/* meteors behind the header content; matches the hero below */}
-                <div className="absolute inset-0 pointer-events-none">
+            <header className="relative w-full h-fit overflow-hidden bg-amber-50 text-gray-900 dark:bg-gray-900 dark:text-white">
+                {/* light-mode origami */}
+                <div className="absolute inset-0 pointer-events-none dark:hidden">
+                    <OrigamiPlanes number={6} />
+                </div>
+                {/* dark-mode meteors */}
+                <div className="absolute inset-0 pointer-events-none hidden dark:block">
                     <Meteors number={12} />
                 </div>
-                {/* glow overlay that fades into the hero's top tint so the
-                    boundary color matches and there's no visible seam */}
-                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-blue-500/10" />
+                {/* glow overlay (dark only) — fades into the hero's top tint so
+                    there's no visible seam between header and hero */}
+                <div className="absolute inset-0 pointer-events-none hidden dark:block bg-gradient-to-b from-transparent to-blue-500/10" />
                 <div className="relative z-10 w-full h-fit flex items-center justify-between p-10 flex-col sm:flex-row" >   
                     {/*
                       Brand block. The `group` class on the wrapper enables Tailwind's parent-hover
@@ -89,7 +95,8 @@ export function Header() {
                     */}
                     <div className="w-fill h-fit flex items-center justify-center gap-4">
                         {/* always visible — login state shouldn't gate theme choice */}
-                        <ThemeToggle />
+                        {/* filled blue + white style on landing — matches Login / Sign Up / Generate my path */}
+                        <ThemeToggle className="border-2 border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 dark:border-blue-500 dark:bg-blue-500 dark:hover:border-blue-400 dark:hover:bg-blue-400" />
                         {isLoggedIn ? (
                             <Button variant="outline" onClick={handleLogOut}>Log Out</Button>
                         ) : (

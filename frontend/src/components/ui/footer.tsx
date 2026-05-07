@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { Meteors } from "@/components/ui/meteors";
+import { OrigamiPlanes } from "@/components/ui/origami-planes";
 import { cn } from "@/lib/utils";
 
 // mirrors the header pattern: on landing, blend with the dark hero (gray-900 +
@@ -17,15 +18,21 @@ export function Footer() {
             className={cn(
                 "relative w-full overflow-hidden",
                 isLanding
-                    ? "bg-gray-900 text-white"
+                    ? // landing: solid soft cream in light, gray-900 in dark — mirrors hero/header
+                      "bg-amber-50 text-gray-900 dark:bg-gray-900 dark:text-white"
                     : "bg-background text-foreground border-t border-foreground/10"
             )}
         >
-            {/* meteor shower only on landing, lighter density than the hero */}
+            {/* landing-only backdrops; light → origami, dark → meteors */}
             {isLanding && (
-                <div className="absolute inset-0 pointer-events-none">
-                    <Meteors number={8} />
-                </div>
+                <>
+                    <div className="absolute inset-0 pointer-events-none dark:hidden">
+                        <OrigamiPlanes number={4} />
+                    </div>
+                    <div className="absolute inset-0 pointer-events-none hidden dark:block">
+                        <Meteors number={8} />
+                    </div>
+                </>
             )}
 
             <div className="relative z-10 flex w-full flex-col items-center justify-between gap-3 px-10 py-6 sm:flex-row">
@@ -34,7 +41,7 @@ export function Footer() {
                     <svg
                         className={cn(
                             "h-7 w-7",
-                            isLanding ? "fill-white" : "fill-foreground"
+                            isLanding ? "fill-gray-900 dark:fill-white" : "fill-foreground"
                         )}
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 1024 1024"
@@ -52,10 +59,10 @@ export function Footer() {
                 <p
                     className={cn(
                         "text-sm",
-                        isLanding ? "text-slate-400" : "text-foreground/70"
+                        isLanding ? "text-gray-600 dark:text-slate-400" : "text-foreground/70"
                     )}
                 >
-                    © {year} Small steps, every day
+                    © {year} LearningPath. One step at a time
                 </p>
             </div>
         </footer>
