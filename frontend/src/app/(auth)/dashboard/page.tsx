@@ -85,10 +85,10 @@ export default function Dashboard() {
                 <h2 className="text-lg font-semibold truncate">
                   {path.topic || "Untitled Topic"}
                 </h2>
-                <p className="text-sm text-secondary">
+                <p className="text-sm text-secondary dark:text-muted-foreground">
                   Proficiency: {path.proficency || "N/A"}
                 </p>
-                <p className="text-sm text-secondary">
+                <p className="text-sm text-secondary dark:text-muted-foreground">
                   Weeks: {path.weeks ?? "N/A"}
                 </p>
               </div>

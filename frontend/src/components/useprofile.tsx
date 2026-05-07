@@ -251,7 +251,7 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                     <div className="flex flex-row w-full gap-8 justify-start items-center">
                         <UserProfile className="w-[10%] h-[10%]" />
                         <div>
-                            <Button className="text-lg hover:bg-background hover:text-foreground">Change Avatar</Button>
+                            <Button className="text-lg text-white hover:bg-background hover:text-foreground">Change Avatar</Button>
                             <p>JPG, GIF, or PNG</p>
                         </div>
                     </div>
@@ -326,15 +326,15 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                             </FieldGroup>
                             <FieldGroup className="flex-row">
                                 <Field>
-                                    <Button type="submit" className="hover:bg-background hover:text-foreground">Save</Button>
+                                    <Button type="submit" className="text-white hover:bg-background hover:text-foreground">Save</Button>
                                 </Field>
 
                                 <Field>
-                                    <Button type="button" className="hover:bg-background hover:text-foreground" onClick={handleLogOut}>Log Out</Button>
+                                    <Button type="button" className="text-white hover:bg-background hover:text-foreground" onClick={handleLogOut}>Log Out</Button>
                                 </Field>
 
                                 <Field>
-                                    <Button type="button" className="hover:bg-background hover:text-foreground" onClick={handleDeleteAccount}>Delete Account</Button>
+                                    <Button type="button" className="text-white hover:bg-background hover:text-foreground" onClick={handleDeleteAccount}>Delete Account</Button>
                                 </Field>
                             </FieldGroup>
                         </div>

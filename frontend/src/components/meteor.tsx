@@ -22,7 +22,7 @@ export function MeteorsDemo() {
           </h1>
 
           <p className="text-slate-400 text-center">
-            Set your goals, and let us build a personalized roadmap to get your there
+            Set your goals, and let us build a personalized roadmap to get you there
           </p>
 
         </div>

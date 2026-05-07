@@ -470,7 +470,7 @@ export default function Schedule() {
                       {/* topic title with a check icon when the week is complete */}
                       <div className="flex items-start gap-1.5">
                         <h3
-                          className="text-base font-semibold text-gray-900 truncate flex-1"
+                          className="text-base font-semibold text-gray-900 dark:text-white truncate flex-1"
                           title={item.topic}
                         >
                           {item.topic}
@@ -487,11 +487,11 @@ export default function Schedule() {
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
                         className={cn(
-                          "mt-2 flex items-start gap-2 text-sm text-gray-700 hover:text-blue-600 hover:underline",
+                          "mt-2 flex items-start gap-2 text-sm text-gray-700 dark:text-muted-foreground hover:text-blue-600 hover:underline",
                           item.completed && "line-through"
                         )}
                       >
-                        <span className="mt-0.5 shrink-0 text-gray-500">
+                        <span className="mt-0.5 shrink-0 text-gray-500 dark:text-muted-foreground">
                           <ResourceIcon type={item.resource.resource_type} />
                         </span>
                         <span className="line-clamp-3">
@@ -501,7 +501,7 @@ export default function Schedule() {
 
                       {/* week label and progress bar */}
                       <div className="mt-3">
-                        <p className="text-xs text-gray-500 mb-1">
+                        <p className="text-xs text-gray-500 dark:text-muted-foreground mb-1">
                           Week {item.weekNumber} of {item.totalWeeks}
                         </p>
                         <div className="h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">

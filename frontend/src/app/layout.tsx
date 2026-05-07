@@ -6,6 +6,7 @@ import { Header } from "@/components/ui/header";
 import { Navbar } from "@/components/ui/navbar";
 import {Toaster} from "sonner";
 import { Footer } from "@/components/ui/footer";
+import { Providers } from "@/components/providers";
 import "./globals.css";
 
 const manrope = Manrope({subsets:['latin'],variable:'--font-sans'});
@@ -33,16 +34,21 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // suppressHydrationWarning is required by next-themes — it sets the
+      // class on <html> before React hydrates to avoid a flash of wrong theme
+      suppressHydrationWarning
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", manrope.variable)}
     >
       <body className="min-h-screen flex flex-col">
-        <Header />
-        <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
-        <Footer />
-        <Toaster />
+        <Providers>
+          <Header />
+          <Navbar />
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

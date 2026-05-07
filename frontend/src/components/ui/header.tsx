@@ -6,6 +6,7 @@ import { DialogLogin } from "@/components/uselogDialog";
 import { DialogSignin } from "@/components/useSignDialog";
 import { handleLogOut } from "@/components/useprofile";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getToken } from "@/lib/auth";
 import * as React from "react";
 
@@ -64,6 +65,8 @@ export function Header() {
                       instead, since prompting them to log in again would be confusing.
                     */}
                     <div className="w-fill h-fit flex items-center justify-center gap-4">
+                        {/* always visible — login state shouldn't gate theme choice */}
+                        <ThemeToggle />
                         {isLoggedIn ? (
                             <Button variant="outline" onClick={handleLogOut}>Log Out</Button>
                         ) : (
@@ -111,11 +114,9 @@ export function Header() {
                         <h1 className="text-lg transition-all duration-300 ease-out group-hover:tracking-wide">Learning Path Generator</h1>
                     </Link>
                     <div className="w-fill h-fit flex items-center justify-end gap-2">
-                        {/*
-                          Authed routes are guarded by AuthLayout, so isLoggedIn is almost always
-                          true here. The guard still helps if a logout fires before the redirect
-                          finishes — the Log Out button hides instead of dangling for a moment.
-                        */}
+                        <ThemeToggle />
+                        {/* AuthLayout guards these routes, but keep the guard so the
+                            button doesn't dangle for a moment during logout */}
                         {isLoggedIn && (
                             <Button variant="outline" onClick={handleLogOut}>Log Out</Button>
                         )}
