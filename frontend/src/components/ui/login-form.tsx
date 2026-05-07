@@ -48,9 +48,11 @@ const formSchema = z.object({
 // used to tell the dialog to close after login
 type LoginFormProps = React.ComponentProps<"div"> & {
   onLoginSuccess?: () => void
+  // close login dialog and open signup dialog (parent owns both)
+  onSwitchToSignup?: () => void
 }
 
-export function LoginForm({className, onLoginSuccess, ...props
+export function LoginForm({className, onLoginSuccess, onSwitchToSignup, ...props
 }: LoginFormProps) {
 
   // used to redirect to dashboard after logging in 
@@ -215,7 +217,14 @@ export function LoginForm({className, onLoginSuccess, ...props
               <Field>
                   <Button type="submit" className="hover:bg-background hover:text-foreground">Login</Button>
                   <FieldDescription className="text-center">
-                    Don&apos;t have an account? <a href="#">Sign up</a>
+                    Don&apos;t have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={onSwitchToSignup}
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      Sign up
+                    </button>
                   </FieldDescription>
               </Field>
   

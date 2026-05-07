@@ -21,10 +21,12 @@ type DialogLoginProps = {
   onOpenChange: (open: boolean) => void
   //optinal to either open dialog by button or by register success
   showTrigger?: boolean
+  // fired when user clicks the "Sign up" link inside the login form
+  onSwitchToSignup?: () => void
 }
 
 
-export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLoginProps) {
+export function DialogLogin({ open, onOpenChange, showTrigger = true, onSwitchToSignup }: DialogLoginProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
         {showTrigger && (
@@ -37,7 +39,10 @@ export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLo
                 Enter your email below to login to your account
             </DialogDescription>
           </DialogHeader>
-            <LoginForm onLoginSuccess = {() => onOpenChange(false)} />
+            <LoginForm
+              onLoginSuccess={() => onOpenChange(false)}
+              onSwitchToSignup={onSwitchToSignup}
+            />
         </DialogContent>
     </Dialog>
   )
