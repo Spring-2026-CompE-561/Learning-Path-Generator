@@ -32,8 +32,9 @@ export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLo
             render={
               <Button
                 variant="outline"
-                // filled blue + white text in both modes; lighter shade in dark for contrast on gray-900
-                className="border-2 border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 hover:text-white dark:border-blue-500 dark:bg-blue-500 dark:hover:border-blue-400 dark:hover:bg-blue-400"
+                // light: filled blue + white text
+                // dark: revert to the default outline (border-input bg-input/30) the variant ships with
+                className="border-2 border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 hover:text-white dark:border dark:border-input dark:bg-input/30 dark:text-foreground dark:hover:bg-input/50 dark:hover:text-foreground"
               >
                 Login
               </Button>

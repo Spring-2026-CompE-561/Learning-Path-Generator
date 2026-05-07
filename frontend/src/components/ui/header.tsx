@@ -95,8 +95,8 @@ export function Header() {
                     */}
                     <div className="w-fill h-fit flex items-center justify-center gap-4">
                         {/* always visible — login state shouldn't gate theme choice */}
-                        {/* filled blue + white style on landing — matches Login / Sign Up / Generate my path */}
-                        <ThemeToggle className="border-2 border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 dark:border-blue-500 dark:bg-blue-500 dark:hover:border-blue-400 dark:hover:bg-blue-400" />
+                        {/* matches Login button exactly — filled blue+white in light, transparent outline in dark */}
+                        <ThemeToggle className="border-2 border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 hover:text-white dark:border dark:border-input dark:bg-input/30 dark:text-foreground dark:hover:bg-input/50 dark:hover:text-foreground" />
                         {isLoggedIn ? (
                             <Button variant="outline" onClick={handleLogOut}>Log Out</Button>
                         ) : (

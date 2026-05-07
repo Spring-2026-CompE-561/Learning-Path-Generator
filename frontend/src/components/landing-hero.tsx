@@ -170,12 +170,14 @@ export function LandingHero() {
               size="lg"
               onClick={handleGenerate}
               className={cn(
+                // light: filled blue + white + blue glow
                 "rounded-full bg-blue-700 px-6 text-base font-semibold text-white",
                 "hover:bg-blue-800 hover:text-white",
-                // blue glow that intensifies on hover
                 "shadow-[0_0_24px_rgba(13,101,157,0.4)] transition-shadow",
                 "hover:shadow-[0_0_36px_rgba(13,101,157,0.65)]",
-                "dark:bg-blue-500 dark:hover:bg-blue-400"
+                // dark: filled yellow + dark text + yellow glow (original)
+                "dark:bg-yellow-300 dark:text-gray-900 dark:hover:bg-yellow-200 dark:hover:text-gray-900",
+                "dark:shadow-[0_0_24px_rgba(247,203,45,0.4)] dark:hover:shadow-[0_0_36px_rgba(247,203,45,0.65)]"
               )}
             >
               Generate my path
