@@ -227,7 +227,7 @@ This project follows **shadcn/ui conventions**:
 To add new components:
 
 ```bash
-npx shadcn-ui@latest add <component-name>
+bunx shadcn-ui@latest add <component-name>
 ```
 
 ---
@@ -341,13 +341,15 @@ bun run dev
 
 ## Testing
 
-### Run all tests
+### Backend (Pytest)
+
+#### Run all tests
 
 ```bash
 uv run pytest src/app/tests/ -v
 ```
 
-### Run specific test groups
+#### Run specific test groups
 
 ```bash
 # User
@@ -362,6 +364,64 @@ uv run pytest src/app/tests/unit_tests/weekly_plan/ -v
 # Resource
 uv run pytest src/app/tests/unit_tests/resources/ -v
 ```
+
+---
+
+### Frontend E2E (Playwright)
+
+This project uses **Playwright** for end-to-end testing of the frontend.
+
+#### Setup
+
+```bash
+cd frontend
+bun install
+bunx playwright install
+```
+
+> **Linux / Ubuntu users:**
+> If tests fail due to missing system libraries, run:
+>
+> ```bash
+> bunx playwright install --with-deps
+> ```
+
+---
+
+#### Run tests
+
+Make sure the application is running first:
+
+```bash
+docker compose up
+```
+
+Then in another terminal:
+
+```bash
+cd frontend
+bun run test:e2e
+```
+
+---
+
+#### Debug tests (optional)
+
+```bash
+bunx playwright test --headed --debug
+```
+
+---
+
+#### Notes
+
+* Tests require both **frontend and backend** to be running
+* Default test URL: `http://localhost:3000`
+* If login-related tests fail, ensure:
+
+  * backend is running (`http://localhost:8000`)
+  * frontend can reach backend API
+  * test user exists or is created during tests
 
 ---
 
