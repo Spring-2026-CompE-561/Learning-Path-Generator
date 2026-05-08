@@ -236,35 +236,69 @@ export function AccountForm({ className, onRegisterSuccess, ...props
     }
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card className="border border-background">
-                <div className="flex flex-col justify-start">
-                    <CardHeader>
-                        <div>
-                            <h2 className="text-5xl">Account Settings</h2>
-                        </div>
-                        <CardDescription>
-                            <p>Manage your profile and preferences</p>
-                        </CardDescription>
-                    </CardHeader>
-                </div>
-                <CardContent className="flex flex-col gap-5">
-                    <div className="flex flex-row w-full gap-8 justify-start items-center">
-                        <UserProfile className="w-[10%] h-[10%]" />
-                        <div>
-                            <Button className="text-lg text-white hover:bg-background hover:text-foreground">Change Avatar</Button>
-                            <p>JPG, GIF, or PNG</p>
+            {/* eyebrow + heading mirror the dashboard's welcome block */}
+            <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-600 dark:text-slate-300">
+                    Settings
+                </p>
+                <h1 className="mt-2 text-4xl font-bold leading-tight text-gray-900 sm:text-5xl dark:text-white">
+                    Account Settings
+                </h1>
+                <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
+                    Manage your profile and preferences
+                </p>
+            </div>
+
+            {/* glass card matching dashboard / detail pages */}
+            <Card
+                className={cn(
+                    "gap-6 rounded-2xl p-2 ring-0",
+                    "border border-foreground/10 bg-white/70 backdrop-blur-md",
+                    "dark:border-white/10 dark:bg-white/[0.03]"
+                )}
+            >
+                <CardHeader>
+                    <CardTitle className="text-lg text-gray-900 dark:text-white">
+                        Profile
+                    </CardTitle>
+                    <CardDescription className="text-gray-600 dark:text-slate-400">
+                        Update the basics on your account.
+                    </CardDescription>
+                </CardHeader>
+
+                <CardContent className="flex flex-col gap-6">
+                    {/* avatar row */}
+                    <div className="flex items-center gap-5">
+                        <UserProfile className="h-16 w-16 text-gray-700 dark:text-slate-200" />
+                        <div className="flex flex-col gap-1">
+                            <Button
+                                type="button"
+                                className={cn(
+                                    "h-9 w-fit rounded-full px-4 text-sm font-semibold",
+                                    "bg-blue-700 text-white hover:bg-blue-800",
+                                    "dark:bg-yellow-300 dark:text-gray-900 dark:hover:bg-yellow-200"
+                                )}
+                            >
+                                Change Avatar
+                            </Button>
+                            <p className="text-xs text-gray-500 dark:text-slate-400">
+                                JPG, GIF, or PNG
+                            </p>
                         </div>
                     </div>
+
                     <form id="signin-form" onSubmit={form.handleSubmit(onSubmit)}>
-                        <div className="gap-5 flex flex-col">
-                            <FieldGroup className="flex-row">
-                                {/*Email Field */}
+                        <div className="flex flex-col gap-6">
+                            <FieldGroup className="flex-col gap-4 sm:flex-row">
+                                {/* email */}
                                 <Controller
                                     name="email"
                                     control={form.control}
                                     render={({ field, fieldState }) => (
                                         <Field data-invalid={fieldState.invalid}>
-                                            <FieldLabel htmlFor="email">Email</FieldLabel>
+                                            <FieldLabel htmlFor="email" className="text-gray-700 dark:text-slate-200">
+                                                Email
+                                            </FieldLabel>
                                             <Input
                                                 {...field}
                                                 id="email"
@@ -278,13 +312,15 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                                         </Field>
                                     )}
                                 />
-                                {/*User-Name Field */}
+                                {/* username */}
                                 <Controller
                                     name="username"
                                     control={form.control}
                                     render={({ field, fieldState }) => (
                                         <Field data-invalid={fieldState.invalid}>
-                                            <FieldLabel htmlFor="username">Username</FieldLabel>
+                                            <FieldLabel htmlFor="username" className="text-gray-700 dark:text-slate-200">
+                                                Username
+                                            </FieldLabel>
                                             <Input
                                                 {...field}
                                                 id="username"
@@ -299,15 +335,15 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                                     )}
                                 />
 
-                                {/*Password Field */}
+                                {/* password */}
                                 <Controller
                                     name="password"
                                     control={form.control}
                                     render={({ field, fieldState }) => (
                                         <Field data-invalid={fieldState.invalid}>
-                                            <div className="flex items-center">
-                                                <FieldLabel htmlFor="password">Password</FieldLabel>
-                                            </div>
+                                            <FieldLabel htmlFor="password" className="text-gray-700 dark:text-slate-200">
+                                                Password
+                                            </FieldLabel>
                                             <Input
                                                 {...field}
                                                 id="password"
@@ -319,26 +355,46 @@ export function AccountForm({ className, onRegisterSuccess, ...props
                                             {fieldState.invalid && (
                                                 <FieldError errors={[fieldState.error]} />
                                             )}
-
                                         </Field>
                                     )}
                                 />
                             </FieldGroup>
-                            <FieldGroup className="flex-row">
-                                <Field>
-                                    <Button type="submit" className="text-white hover:bg-background hover:text-foreground">Save</Button>
-                                </Field>
 
-                                <Field>
-                                    <Button type="button" className="text-white hover:bg-background hover:text-foreground" onClick={handleLogOut}>Log Out</Button>
-                                </Field>
+                            {/* action row — primary save, ghost log-out, destructive delete */}
+                            <div className="flex flex-wrap items-center gap-3 pt-2">
+                                <Button
+                                    type="submit"
+                                    className={cn(
+                                        "h-10 rounded-full px-5 text-sm font-semibold",
+                                        "bg-blue-700 text-white hover:bg-blue-800",
+                                        "dark:bg-yellow-300 dark:text-gray-900 dark:hover:bg-yellow-200"
+                                    )}
+                                >
+                                    Save changes
+                                </Button>
 
-                                <Field>
-                                    <Button type="button" className="text-white hover:bg-background hover:text-foreground" onClick={handleDeleteAccount}>Delete Account</Button>
-                                </Field>
-                            </FieldGroup>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={handleLogOut}
+                                    className="h-10 rounded-full px-4 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-slate-300 dark:hover:text-white"
+                                >
+                                    Log out
+                                </Button>
+
+                                <Button
+                                    type="button"
+                                    onClick={handleDeleteAccount}
+                                    className={cn(
+                                        "ml-auto h-10 rounded-full px-4 text-sm font-medium",
+                                        "border border-red-300 bg-transparent text-red-600 hover:bg-red-50",
+                                        "dark:border-red-400/30 dark:text-red-300 dark:hover:bg-red-500/10"
+                                    )}
+                                >
+                                    Delete account
+                                </Button>
+                            </div>
                         </div>
-
                     </form>
                 </CardContent>
             </Card>

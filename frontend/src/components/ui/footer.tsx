@@ -3,17 +3,19 @@
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-// landing + dashboard, learning-path detail, and schedule all render their own
-// viewport-spanning fixed backdrop (gradient / meteors / origami), so the footer
-// is transparent on those routes and lets the shared backdrop flow underneath
-// continuously. any other page still gets the plain theme bg with a top border.
+// landing + the auth pages (dashboard, learning-path detail, schedule, account)
+// all render their own viewport-spanning fixed backdrop (gradient / meteors /
+// origami), so the footer is transparent on those routes and lets the shared
+// backdrop flow underneath continuously. any other page still gets the plain
+// theme bg with a top border.
 export function Footer() {
     const pathname = usePathname();
     const isLanding = pathname === "/";
     const isDashboard = pathname?.startsWith("/dashboard") ?? false;
     const isLearningPath = pathname?.startsWith("/learning-path") ?? false;
     const isSchedule = pathname?.startsWith("/schedule") ?? false;
-    const usesSharedBackdrop = isLanding || isDashboard || isLearningPath || isSchedule;
+    const isAccount = pathname?.startsWith("/account") ?? false;
+    const usesSharedBackdrop = isLanding || isDashboard || isLearningPath || isSchedule || isAccount;
     const year = new Date().getFullYear();
 
     return (
