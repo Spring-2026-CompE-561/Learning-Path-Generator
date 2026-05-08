@@ -3,7 +3,6 @@ import { Geist, Geist_Mono, Manrope } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Header } from "@/components/ui/header";
-import { Navbar } from "@/components/ui/navbar";
 import {Toaster} from "sonner";
 import { Footer } from "@/components/ui/footer";
 import { Providers } from "@/components/providers";
@@ -42,7 +41,6 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col">
         <Providers>
           <Header />
-          <Navbar />
           <main className="flex-1">
             {children}
           </main>

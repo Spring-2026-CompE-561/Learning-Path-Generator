@@ -45,7 +45,8 @@ const formSchema = z.object({
   rememberMe: z.boolean(),
 })
 
-// used to tell the dialog to close after login
+// used to tell the dialog to close after login, or to switch over to the signup
+// dialog when the user clicks "Sign up" inside the login form.
 type LoginFormProps = React.ComponentProps<"div"> & {
   onLoginSuccess?: () => void
   // close login dialog and open signup dialog (parent owns both)
@@ -141,7 +142,8 @@ export function LoginForm({className, onLoginSuccess, onSwitchToSignup, ...props
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      {/* card is transparent so the popup's theme bg (set on DialogContent) shows through */}
+      <Card className="border-0 bg-transparent shadow-none">
         <CardContent>
           <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
@@ -215,7 +217,18 @@ export function LoginForm({className, onLoginSuccess, onSwitchToSignup, ...props
                 )}
               />
               <Field>
-                  <Button type="submit" className="hover:bg-background hover:text-foreground">Login</Button>
+                  {/* matches the design-system pill used in the header / dashboard CTAs:
+                      solid blue (light) / yellow (dark), rounded-full, borderless. */}
+                  <Button
+                    type="submit"
+                    className={cn(
+                      "h-10 rounded-full border-transparent px-4 text-sm font-semibold",
+                      "bg-blue-700 text-white hover:bg-blue-800",
+                      "dark:bg-yellow-300 dark:text-gray-900 dark:hover:bg-yellow-200"
+                    )}
+                  >
+                    Login
+                  </Button>
                   <FieldDescription className="text-center">
                     Don&apos;t have an account?{" "}
                     <button

@@ -370,12 +370,22 @@ export default function Schedule() {
   const colorFor = (id: number) => colorMap[id] ?? fallbackColor;
 
   return (
-    <div className="relative min-h-screen w-full p-8">
+    <>
+      {/* fixed backdrop matching the dashboard — gradient in light, solid gray in dark.
+          no meteors / origami here, just the color so the page tone matches. */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 bg-gradient-to-bl from-amber-100 to-sky-100 dark:bg-gray-900 dark:bg-none"
+      />
+
+      <div className="relative z-10 min-h-screen w-full p-8">
       {/* heading on the left, week selector on the right */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-primary">Schedule</h1>
-          <p className="mt-1 text-sm text-gray-500">{subtitle}</p>
+          <h1 className="text-4xl font-bold leading-tight text-gray-900 sm:text-5xl dark:text-white">
+            Schedule
+          </h1>
+          <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">{subtitle}</p>
         </div>
 
         {/* lets the user peek up to four weeks ahead, current week is the default */}
@@ -399,8 +409,8 @@ export default function Schedule() {
         </Select>
       </div>
 
-      {loading && <p className="mt-6 text-sm text-gray-500">Loading...</p>}
-      {error && <p className="mt-6 text-sm text-red-600">{error}</p>}
+      {loading && <p className="mt-6 text-sm text-gray-600 dark:text-slate-400">Loading...</p>}
+      {error && <p className="mt-6 text-sm text-red-600 dark:text-red-400">{error}</p>}
 
       {/* one column per day at desktop, collapses to two then one on smaller screens */}
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7">
@@ -418,21 +428,21 @@ export default function Schedule() {
                 // vertical divider between columns at desktop, skipped on the last one
                 !isLast && "lg:border-r lg:border-border",
                 // soft tint on the column that represents today
-                isToday && "bg-primary/5 rounded-xl"
+                isToday && "rounded-xl bg-primary/5 dark:bg-yellow-300/5"
               )}
             >
               {/* day name with the small today pill when this column is the current day */}
               <div className="flex items-baseline gap-2">
                 <h2
                   className={cn(
-                    "text-lg font-semibold",
-                    isToday && "text-primary"
+                    "text-lg font-semibold text-gray-900 dark:text-white",
+                    isToday && "text-primary dark:text-yellow-300"
                   )}
                 >
                   {day}
                 </h2>
                 {isToday && (
-                  <span className="text-xs font-medium text-primary">
+                  <span className="text-xs font-medium text-primary dark:text-yellow-300">
                     Today
                   </span>
                 )}
@@ -440,8 +450,8 @@ export default function Schedule() {
 
               {items.length === 0 ? (
                 // shown when no sessions are scheduled for the day
-                <div className="rounded-xl border border-dashed border-gray-300 p-4 text-center">
-                  <p className="text-sm text-gray-400">Rest day</p>
+                <div className="rounded-xl border border-dashed border-foreground/15 p-4 text-center dark:border-white/10">
+                  <p className="text-sm text-gray-500 dark:text-slate-400">Rest day</p>
                 </div>
               ) : (
                 items.map((item) => {
@@ -520,6 +530,7 @@ export default function Schedule() {
           );
         })}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

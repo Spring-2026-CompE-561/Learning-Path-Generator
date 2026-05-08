@@ -30,9 +30,20 @@ export function DialogLogin({ open, onOpenChange, showTrigger = true, onSwitchTo
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
         {showTrigger && (
-          <DialogTrigger render={<Button variant="outline">Login</Button>} />
+          <DialogTrigger
+            render={
+              <Button
+                // matches the dashboard's filled pill: solid blue (light) / yellow (dark),
+                // borderless, h-8 inside the parent's clear-bubble wrapper.
+                className="h-8 rounded-full border-transparent bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800 dark:bg-yellow-300 dark:text-gray-900 dark:hover:bg-yellow-200"
+              >
+                Login
+              </Button>
+            }
+          />
         )}
-        <DialogContent className="sm:max-w-sm">
+        {/* popup bg matches the page theme (amber→sky gradient in light, gray-900 in dark) */}
+        <DialogContent className="sm:max-w-sm bg-gradient-to-bl from-amber-100 to-sky-100 dark:bg-gray-900 dark:bg-none">
           <DialogHeader>
             <DialogTitle>Login to your account</DialogTitle>
             <DialogDescription>

@@ -151,7 +151,8 @@ export function SigninForm({className, onRegisterSuccess, onAutoLoginSuccess, ..
   }
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
+      {/* card is transparent so the popup's theme bg (set on DialogContent) shows through */}
+      <Card className="border-0 bg-transparent shadow-none">
         <CardContent>
           <form id="signin-form" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
@@ -245,7 +246,18 @@ export function SigninForm({className, onRegisterSuccess, onAutoLoginSuccess, ..
                   )}
               />
               <Field>
-                  <Button className="hover:bg-background hover:text-foreground"type="submit">Sign Up</Button>
+                  {/* matches the design-system pill used in the header / dashboard CTAs:
+                      solid blue (light) / yellow (dark), rounded-full, borderless. */}
+                  <Button
+                    type="submit"
+                    className={cn(
+                      "h-10 rounded-full border-transparent px-4 text-sm font-semibold",
+                      "bg-blue-700 text-white hover:bg-blue-800",
+                      "dark:bg-yellow-300 dark:text-gray-900 dark:hover:bg-yellow-200"
+                    )}
+                  >
+                    Sign Up
+                  </Button>
               </Field>
   
             </FieldGroup>
