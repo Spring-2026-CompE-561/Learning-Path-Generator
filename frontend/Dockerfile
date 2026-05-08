@@ -1,6 +1,7 @@
 # Official Bun image. Bun is the package manager (per bun.lock) AND the
 # runtime that executes the Next.js dev server.
-FROM oven/bun:1
+#stage 1 Building
+FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
@@ -12,8 +13,23 @@ RUN bun install --frozen-lockfile
 # at runtime for hot reload; this COPY makes the image runnable standalone.
 COPY . .
 
+# building
+Run bun run build
+
+#Stage 2L minimal runtime
+FROM oven/bun:1-slim
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=builder /app/.next .next
+COPY --from=builder /app/public public
+COPY --from=builder /app/package.json package.json
+COPY --from=builder /app/bun.lock bun.lock
+COPY --from=builder /app/node_modules node_modules
+
+
+
 EXPOSE 3000
 
-# Next defaults to listening on all interfaces inside containers, but we
-# pass -H 0.0.0.0 explicitly so behavior doesn't depend on Next's defaults.
-CMD ["bunx", "next", "dev", "-H", "0.0.0.0"]
+CMD ["bun","run", "start"]

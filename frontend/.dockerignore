@@ -28,6 +28,10 @@ node_modules/
 .bun/
 bun.lockb
 
+# Bun / package-manager caches
+.bun/
+bun.lockb
+
 # Build/cache artifacts
 dist/
 build/

@@ -8,7 +8,14 @@ import { Button } from "@/components/ui/button"
 // the icons are CSS-toggled, but the aria-label depends on the resolved theme,
 // which only the client knows. render a generic label until mounted so server
 // and client agree on first paint, then swap to the dynamic label.
-export function ThemeToggle() {
+
+
+//allowing ThemeToggle to accpet className class of typeScript
+type ThemeToggleProps = {
+  className: string
+}
+
+export function ThemeToggle( {className }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
