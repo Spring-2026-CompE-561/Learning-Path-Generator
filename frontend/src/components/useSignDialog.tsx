@@ -37,7 +37,8 @@ export function DialogSignin({ open, onOpenChange, onRegisterSuccess, onAutoLogi
             </Button>
           }
         />
-        <DialogContent className="sm:max-w-sm">
+        {/* popup bg matches the page theme (amber→sky gradient in light, gray-900 in dark) */}
+        <DialogContent className="sm:max-w-sm bg-gradient-to-bl from-amber-100 to-sky-100 dark:bg-gray-900 dark:bg-none">
           <DialogHeader>
             <DialogTitle>Create your LearningPath Account</DialogTitle>
             <DialogDescription>

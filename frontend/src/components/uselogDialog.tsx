@@ -40,14 +40,23 @@ export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLo
             }
           />
         )}
-        <DialogContent className="sm:max-w-sm">
+        {/* popup bg matches the page theme (amber→sky gradient in light, gray-900 in dark) */}
+        <DialogContent className="sm:max-w-sm bg-gradient-to-bl from-amber-100 to-sky-100 dark:bg-gray-900 dark:bg-none">
           <DialogHeader>
             <DialogTitle>Login to your account</DialogTitle>
             <DialogDescription>
                 Enter your email below to login to your account
             </DialogDescription>
           </DialogHeader>
-            <LoginForm onLoginSuccess = {() => onOpenChange(false)} />
+            <LoginForm
+              onLoginSuccess={() => onOpenChange(false)}
+              // close this dialog and ask the header to open the signup dialog —
+              // the header's existing "open-signup" listener handles the latter.
+              onSwitchToSignup={() => {
+                onOpenChange(false)
+                window.dispatchEvent(new Event("open-signup"))
+              }}
+            />
         </DialogContent>
     </Dialog>
   )
