@@ -29,10 +29,9 @@ export function DialogSignin({ open, onOpenChange, onRegisterSuccess, onAutoLogi
         <DialogTrigger
           render={
             <Button
-              variant="outline"
-              // light: filled blue + white text (matches Login)
-              // dark: revert to the default outline variant
-              className="border border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 hover:text-white dark:border dark:border-input dark:bg-input/30 dark:text-foreground dark:hover:bg-input/50 dark:hover:text-foreground"
+              // matches the dashboard's filled pill: solid blue (light) / yellow (dark),
+              // borderless, h-8 inside the parent's clear-bubble wrapper.
+              className="h-8 rounded-full border-transparent bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800 dark:bg-yellow-300 dark:text-gray-900 dark:hover:bg-yellow-200"
             >
               Sign Up
             </Button>
