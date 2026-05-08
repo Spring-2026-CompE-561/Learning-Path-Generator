@@ -11,12 +11,23 @@ import { cn } from "@/lib/utils"
 type WeekPlan = { week: number; title: string; bullets: string[] }
 type Outline = { topic: string; weeks: WeekPlan[] }
 
-const sampleOutline: Outline = {
+// dark-mode sample, python / data analysis vibe to match the meteor backdrop
+const sampleOutlineDark: Outline = {
   topic: "Sample: Python for data analysis",
   weeks: [
     { week: 1, title: "Setup & syntax", bullets: ["Install Python + Jupyter", "Lists, dicts, comprehensions"] },
     { week: 2, title: "NumPy & pandas", bullets: ["DataFrames, indexing, joins", "Cleaning a real dataset"] },
     { week: 3, title: "Visualization", bullets: ["matplotlib + seaborn basics", "Build a one-page report"] },
+  ],
+}
+
+// light-mode sample, webdev track, friendlier for the cream/origami look
+const sampleOutlineLight: Outline = {
+  topic: "Sample: Web development for beginners",
+  weeks: [
+    { week: 1, title: "HTML & CSS foundations", bullets: ["Semantic tags, the box model", "Flexbox + grid basics"] },
+    { week: 2, title: "JavaScript essentials", bullets: ["Variables, functions, the DOM", "Fetch API + async/await"] },
+    { week: 3, title: "Build with React", bullets: ["Components, props, state", "Ship a small portfolio site"] },
   ],
 }
 
@@ -127,24 +138,32 @@ export function LandingHero() {
 
   return (
     <>
-      {/* HERO
-            light: beige cream gradient + drifting origami planes (blue + yellow)
-            dark:  gray-900 + meteor shower (unchanged from previous design)
-          backdrops both render but `dark:hidden` / `hidden dark:block` swaps
-          which one is visible — keeps the theme switch smooth without a flash. */}
-      <section className="relative w-full overflow-hidden bg-amber-50 dark:bg-gray-900">
-        {/* light-mode origami planes */}
+      {/* SHARED LANDING BACKDROP
+            One viewport-spanning fixed layer so meteors/origami flow continuously
+            across header → hero → sample → footer instead of being clipped at each
+            section's overflow-hidden box. Unmounts when the user navigates off "/".
+            light: cream + drifting origami planes (blue + yellow)
+            dark:  gray-900 + meteor shower + faint blue→teal tint */}
+      <div
+        aria-hidden
+        // light: diagonal amber→sky gradient (yellow upper-right blending into pale blue
+        // lower-left; the warm "beige" is just the midpoint where the two colors meet).
+        // dark: original gray-900 — `dark:bg-none` strips the gradient image so the
+        // solid bg-gray-900 takes over cleanly.
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-gradient-to-bl from-amber-100 to-sky-100 dark:bg-gray-900 dark:bg-none"
+      >
         <div className="absolute inset-0 dark:hidden">
-          <OrigamiPlanes number={14} />
+          <OrigamiPlanes number={20} />
         </div>
-        {/* dark-mode meteors */}
         <div className="absolute inset-0 hidden dark:block">
-          <Meteors number={30} />
+          <Meteors number={40} />
         </div>
-        {/* glow overlay; dark mode keeps the blue/teal tint, light mode is invisible */}
         <div className="absolute inset-0 hidden dark:block bg-gradient-to-b from-blue-500/10 via-transparent to-teal-500/10" />
+      </div>
 
-        <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center px-6 py-24 text-center sm:py-32">
+      {/* HERO — transparent so the shared backdrop shows through */}
+      <section className="relative z-10 w-full">
+        <div className="mx-auto flex max-w-3xl flex-col items-center px-6 py-24 text-center sm:py-32">
           {/* pill badge — white floating chip in light, translucent in dark */}
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-white/80 px-4 py-1.5 text-sm text-gray-700 shadow-sm backdrop-blur-sm dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:shadow-none">
             <Sparkles className="h-3.5 w-3.5 text-primary dark:text-yellow-300" />
@@ -187,7 +206,7 @@ export function LandingHero() {
               size="lg"
               variant="outline"
               onClick={handleSeeSample}
-              className="rounded-full border-gray-300 bg-white px-6 text-base font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-900 dark:border-white/20 dark:bg-white/5 dark:text-white dark:backdrop-blur-sm dark:hover:bg-white/10 dark:hover:text-white"
+              className="rounded-full border-gray-300/40 bg-white px-6 text-base font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-900 dark:border-white/20 dark:bg-white/5 dark:text-white dark:backdrop-blur-sm dark:hover:bg-white/10 dark:hover:text-white"
             >
               <Play className="mr-2 h-4 w-4 fill-current" />
               See a sample plan
@@ -196,12 +215,11 @@ export function LandingHero() {
         </div>
       </section>
 
-      {/* SAMPLE PLAN SECTION — scroll target for the secondary CTA */}
-      <section ref={sampleRef} className="relative w-full bg-amber-50 px-6 py-20 dark:bg-gray-900">
-        {/* dark-mode tint so the sample reads as distinct from the hero above */}
-        <div className="absolute inset-0 hidden dark:block bg-gradient-to-b from-gray-900 via-gray-950 to-gray-900" />
-
-        <div className="relative z-10 mx-auto max-w-2xl">
+      {/* SAMPLE PLAN SECTION — scroll target for the secondary CTA.
+          transparent so the shared backdrop above shows through; the card itself
+          provides the visual frame that previously came from the section bg. */}
+      <section ref={sampleRef} className="relative z-10 w-full px-6 py-20">
+        <div className="mx-auto max-w-2xl">
           <div className="mb-2 flex items-center justify-center gap-2">
             <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500 dark:bg-emerald-400" />
             <span className="text-xs uppercase tracking-wider text-gray-600 dark:text-slate-400">
@@ -215,9 +233,16 @@ export function LandingHero() {
             A peek at the kind of week-by-week breakdown you&apos;ll get.
           </p>
 
-          {/* card uses light glass in light mode, dark glass in dark */}
+          {/* card uses light glass in light mode, dark glass in dark.
+              two ResultCards render — only one is visible per theme via dark:hidden / hidden dark:block,
+              same pattern as origami planes vs meteors above. */}
           <div className="rounded-2xl border border-foreground/10 bg-white/70 p-6 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-gray-900/70 dark:shadow-none">
-            <ResultCard outline={sampleOutline} />
+            <div className="dark:hidden">
+              <ResultCard outline={sampleOutlineLight} />
+            </div>
+            <div className="hidden dark:block">
+              <ResultCard outline={sampleOutlineDark} />
+            </div>
           </div>
         </div>
       </section>

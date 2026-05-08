@@ -17,7 +17,15 @@ type Plane = {
   duration: number;
 };
 
-export function OrigamiPlanes({ number = 14 }: { number?: number }) {
+// speedScale multiplies the drift duration so callers can vary the feel
+// (e.g. dashboard footer drifts slightly slower than the landing hero).
+export function OrigamiPlanes({
+  number = 14,
+  speedScale = 1,
+}: {
+  number?: number;
+  speedScale?: number;
+}) {
   const [planes, setPlanes] = React.useState<Plane[]>([]);
 
   React.useEffect(() => {
@@ -29,10 +37,10 @@ export function OrigamiPlanes({ number = 14 }: { number?: number }) {
         color: i % 2 === 0 ? "blue" : "yellow",
         size: 28 + ((i * 7) % 18), // 28-46px so depth varies
         delay: (i * 0.4) % 6,
-        duration: 14 + ((i * 1.3) % 6), // 14-20s for slow drift
+        duration: (14 + ((i * 1.3) % 6)) * speedScale, // 14-20s baseline for slow drift
       }))
     );
-  }, [number]);
+  }, [number, speedScale]);
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">

@@ -1,39 +1,28 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Meteors } from "@/components/ui/meteors";
-import { OrigamiPlanes } from "@/components/ui/origami-planes";
 import { cn } from "@/lib/utils";
 
-// mirrors the header pattern: on landing, blend with the dark hero (gray-900 +
-// meteors); on every other page, fall back to the normal theme bg with a thin
-// themed border-top.
+// landing AND /dashboard render their own viewport-spanning fixed backdrop
+// (meteors / origami / tint), so the footer is transparent on those routes and
+// lets the shared backdrop flow underneath it continuously. every other page
+// still gets the plain theme bg with a top border.
 export function Footer() {
     const pathname = usePathname();
     const isLanding = pathname === "/";
+    const isDashboard = pathname?.startsWith("/dashboard") ?? false;
+    const usesSharedBackdrop = isLanding || isDashboard;
     const year = new Date().getFullYear();
 
     return (
         <footer
             className={cn(
-                "relative w-full overflow-hidden",
-                isLanding
-                    ? // landing: solid soft cream in light, gray-900 in dark — mirrors hero/header
-                      "bg-amber-50 text-gray-900 dark:bg-gray-900 dark:text-white"
+                "relative z-10 w-full",
+                usesSharedBackdrop
+                    ? "bg-transparent text-gray-900 dark:text-white"
                     : "bg-background text-foreground border-t border-foreground/10"
             )}
         >
-            {/* landing-only backdrops; light → origami, dark → meteors */}
-            {isLanding && (
-                <>
-                    <div className="absolute inset-0 pointer-events-none dark:hidden">
-                        <OrigamiPlanes number={4} />
-                    </div>
-                    <div className="absolute inset-0 pointer-events-none hidden dark:block">
-                        <Meteors number={8} />
-                    </div>
-                </>
-            )}
 
             <div className="relative z-10 flex w-full flex-col items-center justify-between gap-3 px-10 py-6 sm:flex-row">
                 {/* left: logo + brand */}
@@ -41,7 +30,7 @@ export function Footer() {
                     <svg
                         className={cn(
                             "h-7 w-7",
-                            isLanding ? "fill-gray-900 dark:fill-white" : "fill-foreground"
+                            usesSharedBackdrop ? "fill-gray-900 dark:fill-white" : "fill-foreground"
                         )}
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 1024 1024"
@@ -59,7 +48,7 @@ export function Footer() {
                 <p
                     className={cn(
                         "text-sm",
-                        isLanding ? "text-gray-600 dark:text-slate-400" : "text-foreground/70"
+                        usesSharedBackdrop ? "text-gray-600 dark:text-slate-400" : "text-foreground/70"
                     )}
                 >
                     © {year} LearningPath. One step at a time

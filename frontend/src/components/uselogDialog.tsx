@@ -34,7 +34,7 @@ export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLo
                 variant="outline"
                 // light: filled blue + white text
                 // dark: revert to the default outline (border-input bg-input/30) the variant ships with
-                className="border-2 border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 hover:text-white dark:border dark:border-input dark:bg-input/30 dark:text-foreground dark:hover:bg-input/50 dark:hover:text-foreground"
+                className="border border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800 hover:text-white dark:border dark:border-input dark:bg-input/30 dark:text-foreground dark:hover:bg-input/50 dark:hover:text-foreground"
               >
                 Login
               </Button>
