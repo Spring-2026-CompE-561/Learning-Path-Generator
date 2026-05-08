@@ -23,7 +23,7 @@ __pycache__/
 .idea/
 .vscode/
 
-#Git
+# Git
 .git
 .gitignore
 
