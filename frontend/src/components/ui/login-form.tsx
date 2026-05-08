@@ -49,6 +49,7 @@ const formSchema = z.object({
 // dialog when the user clicks "Sign up" inside the login form.
 type LoginFormProps = React.ComponentProps<"div"> & {
   onLoginSuccess?: () => void
+  // close login dialog and open signup dialog (parent owns both)
   onSwitchToSignup?: () => void
 }
 
@@ -233,7 +234,7 @@ export function LoginForm({className, onLoginSuccess, onSwitchToSignup, ...props
                     <button
                       type="button"
                       onClick={onSwitchToSignup}
-                      className="underline underline-offset-3 hover:text-foreground"
+                      className="text-primary underline-offset-4 hover:underline"
                     >
                       Sign up
                     </button>

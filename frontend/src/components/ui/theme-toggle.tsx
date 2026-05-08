@@ -5,12 +5,10 @@ import { Sun, Moon } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 
-// aria-label depends on the resolved theme (only known on the client). render a
-// generic label until mounted so SSR and the first client render agree, then
-// swap to the dynamic label after hydration. without this gate the server
-// renders "Switch to dark mode" and the client renders "Switch to light mode"
-// (or vice versa), tripping a hydration warning that breaks event binding.
-export function ThemeToggle({ className }: { className?: string }) {
+// the icons are CSS-toggled, but the aria-label depends on the resolved theme,
+// which only the client knows. render a generic label until mounted so server
+// and client agree on first paint, then swap to the dynamic label.
+export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
@@ -22,7 +20,6 @@ export function ThemeToggle({ className }: { className?: string }) {
     <Button
       variant="outline"
       size="icon"
-      className={className}
       aria-label={mounted ? `Switch to ${next} mode` : "Toggle theme"}
       onClick={() => setTheme(next)}
     >

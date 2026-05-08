@@ -153,6 +153,10 @@ export function Header() {
                                 <DialogLogin
                                     open={loginOpen}
                                     onOpenChange={setLoginOpen}
+                                    onSwitchToSignup={() => {
+                                        setLoginOpen(false)
+                                        setRegisterOpen(true)
+                                    }}
                                 />
                                 <DialogSignin
                                     open={registerOpen}

@@ -21,10 +21,12 @@ type DialogLoginProps = {
   onOpenChange: (open: boolean) => void
   //optinal to either open dialog by button or by register success
   showTrigger?: boolean
+  // fired when user clicks the "Sign up" link inside the login form
+  onSwitchToSignup?: () => void
 }
 
 
-export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLoginProps) {
+export function DialogLogin({ open, onOpenChange, showTrigger = true, onSwitchToSignup }: DialogLoginProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
         {showTrigger && (
@@ -50,12 +52,7 @@ export function DialogLogin({ open, onOpenChange, showTrigger = true }: DialogLo
           </DialogHeader>
             <LoginForm
               onLoginSuccess={() => onOpenChange(false)}
-              // close this dialog and ask the header to open the signup dialog —
-              // the header's existing "open-signup" listener handles the latter.
-              onSwitchToSignup={() => {
-                onOpenChange(false)
-                window.dispatchEvent(new Event("open-signup"))
-              }}
+              onSwitchToSignup={onSwitchToSignup}
             />
         </DialogContent>
     </Dialog>
