@@ -5,6 +5,8 @@ WORKDIR /app
 
 # Preventing uv from keeping package cache
 ENV UV_NO_CACHE=1
+#path to find app/src
+ENV PYTHONPATH=/app/src
 
 # Copy dependency manifests first so this layer caches
 # until pyproject.toml / uv.lock actually change.
@@ -22,7 +24,9 @@ RUN uv sync --frozen
 
 EXPOSE 8000
 
+
+
 # uvicorn binds to 127.0.0.1 by default — unreachable from outside
 # the container. --host 0.0.0.0 makes it listen on all interfaces so
 # the published port (compose's "8000:8000") actually works.
-CMD ["uv", "run", "uvicorn", "src.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
