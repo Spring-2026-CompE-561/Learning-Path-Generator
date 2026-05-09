@@ -2,25 +2,21 @@
 
 import * as React from "react"
 import { useRouter, useParams } from "next/navigation"
-import { Video, FileText, BookOpen, Pencil, Headphones } from "lucide-react"
-import {Button } from "@/components/ui/button"
+import { ArrowLeft, Video, FileText, BookOpen, Pencil, Headphones } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { getToken, clearToken } from "@/lib/auth"
 
-// used for the data that the backend should returm
-
-// this would be one resource for a weekly plan
+// one resource inside a weekly plan
 type Resource = {
-    // id for resource, type of resource, the simmary of the resource itself, and the URL -> or search
   id: number
   resource_type: "video" | "audio" | "article" | "problems" | "course"
   resource_summary: string
   url: string
 }
 
-
-// a singular week of the learning path
+// a single week of the learning path
 type WeeklyPlan = {
-    // id, week number, goal, the description of the week, and completion -> lowk probably not gonna use
   id: number
   week_number: number
   goal: string[]
@@ -29,9 +25,8 @@ type WeeklyPlan = {
   resources: Resource[]
 }
 
-// Learning path 
+// full learning path payload
 type LearningPath = {
-    // info about the learning path 
   id: number
   topic: string
   proficency: string | null
@@ -39,97 +34,52 @@ type LearningPath = {
   created_at: string
   weekly_plans: WeeklyPlan[]
 }
-// gives an icon depending on the type of resouce
+
+// icon per resource type
 function ResourceIcon({ type }: { type: Resource["resource_type"] }) {
-
-  // icon for vid
-  if (type === "video")
-  {
-    return <Video className="h-4 w-4" />
-  } 
-
-  // icon for audio
-  if (type === "audio")
-  {
-    return <Headphones className="h-4 w-4" />
-  } 
-
-  // icon for article
-  if (type === "article")
-  {
-    return <FileText className="h-4 w-4" />
-  } 
-
-  // problems
-  if (type === "problems")
-  {
-    return <Pencil className="h-4 w-4" />
-  } 
-
-  // courses
-  if (type === "course")
-  {
-    return <BookOpen className="h-4 w-4" />
-  } 
-
-  // if its not one of the types idk how but return nothing
+  if (type === "video") return <Video className="h-4 w-4" />
+  if (type === "audio") return <Headphones className="h-4 w-4" />
+  if (type === "article") return <FileText className="h-4 w-4" />
+  if (type === "problems") return <Pencil className="h-4 w-4" />
+  if (type === "course") return <BookOpen className="h-4 w-4" />
   return null
 }
 
-
-// loads when user clicks card on dashboard
+// loads when user clicks a card on the dashboard
 export default function LearningPathDetail() {
-
-  // help with navi to dashboard
   const router = useRouter()
-
-  // grabs id from url
   const params = useParams<{ id: string }>()
 
-  // holds fetched data
   const [path, setPath] = React.useState<LearningPath | null>(null)
-
-  // loading until done ffetching
   const [loading, setLoading] = React.useState(true)
-
-  // message if soemthing fails
   const [error, setError] = React.useState<string | null>(null)
 
   // fetch learning path
   React.useEffect(() => {
     const fetchPath = async () => {
-      // pulls JWT and if no token, not authorized -> go to login
       const token = getToken()
       if (!token) {
         router.push("/")
         return
       }
 
-      // get
       try {
         const res = await fetch(`http://127.0.0.1:8000/learning-paths/${params.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
 
-        // expired or invalid token
-        if (res.status === 401)
-        {
+        if (res.status === 401) {
           clearToken()
           router.push("/")
           return
         }
 
-        // path id doesnt exist or doesnt belong to user = 404
-        if (res.status === 404) 
-        {
+        if (res.status === 404) {
           setError("Learning path not found")
           return
         }
 
-        if (!res.ok)
-        {
-          throw new Error("Failed to fetch learning path")
-        }
+        if (!res.ok) throw new Error("Failed to fetch learning path")
 
         const data: LearningPath = await res.json()
         setPath(data)
@@ -141,92 +91,114 @@ export default function LearningPathDetail() {
       }
     }
 
-    // actually fetch 
     fetchPath()
   }, [params.id, router])
 
-  // if still fetching then loading message
-  if (loading) 
-  {
-    return <p className="p-8">Loading...</p>
-  }
-
-  // error = error with back buttom
-  if (error) 
-  {
-    return (
-      <div className="p-8">
-        <Button variant="ghost" onClick={() => router.push("/dashboard")}>
-          ← Back to dashboard
-        </Button>
-        <p className="mt-4">{error}</p>
-      </div>
-    )
-  }
-
-  if (!path) 
-  {
-    return null
-  }
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      {/* back link to dashboard */}
-      <Button variant="ghost" onClick={() => router.push("/dashboard")} className="mb-6 bg-primary">
-        ← Back to dashboard
-      </Button>
+    <>
+      {/* fixed backdrop matching the dashboard / schedule pages — no effects */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 bg-gradient-to-bl from-amber-100 to-sky-100 dark:bg-gray-900 dark:bg-none"
+      />
 
-      {/* path header, topic, proficency, and weeks */}
-      <h1 className="text-3xl font-bold">{path.topic}</h1>
-      <p className="text-gray-500 mt-1">
-        {path.proficency || "N/A"} • {path.weeks} weeks
-      </p>
+      <div className="relative z-10 mx-auto max-w-4xl px-6 pb-20 pt-8">
+        {/* back link */}
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/dashboard")}
+          className="mb-6 -ml-2 text-gray-700 hover:text-gray-900 dark:text-slate-300 dark:hover:text-white"
+        >
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Back to dashboard
+        </Button>
 
-      <hr className="my-6" />
+        {loading && (
+          <p className="text-sm text-gray-600 dark:text-slate-400">Loading...</p>
+        )}
 
-      {/* one section per weekly plan same as dashboard card pattern */}
-      <div className="space-y-6">
-        {path.weekly_plans.map((plan) => (
-          <div key={plan.id} className="p-6 border rounded-xl 
-          shadow hover:shadow-md transition
-          bg-background">
-            <h2 className="text-xl font-semibold">Week {plan.week_number}</h2>
-            <p className="text-secondary dark:text-muted-foreground mt-2">{plan.plan_description}</p>
+        {error && !loading && (
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        )}
 
-            {/* goals list -> goals generated by the AI for the week*/}
-            <div className="mt-4">
-              <h3 className="text-sm font-semibold text-secondary dark:text-muted-foreground">Goals</h3>
-              <ul className="list-disc list-inside mt-1 text-sm text-secondary dark:text-muted-foreground">
-                {plan.goal.map((g, idx) => (
-                  <li key={idx}>{g}</li>
-                ))}
-              </ul>
+        {path && !loading && (
+          <>
+            {/* path header */}
+            <div className="mb-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-600 dark:text-slate-300">
+                Learning path
+              </p>
+              <h1 className="mt-2 text-4xl font-bold leading-tight text-gray-900 sm:text-5xl dark:text-white">
+                {path.topic}
+              </h1>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
+                <span className="rounded-full border border-yellow-500/40 bg-yellow-300/20 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:border-yellow-300/30 dark:bg-yellow-300/10 dark:text-yellow-300">
+                  {path.proficency || "N/A"}
+                </span>
+                <span>•</span>
+                <span>{path.weeks} weeks</span>
+              </div>
             </div>
 
-            {/* resources list -> 3-5 resources a week*/}
-            <div className="mt-4">
-              <h3 className="text-sm font-semibold text-secondary dark:text-muted-foreground">Resources</h3>
-              <ul className="mt-2 space-y-2">
-                {plan.resources.map((resource) => (
-                  <li key={resource.id} className="flex items-start gap-2">
-                    <span className="mt-1 text-secondary dark:text-muted-foreground">
-                      <ResourceIcon type={resource.resource_type} />
-                    </span>
-                    <a
-                    
-                      href={resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:underline text-foreground"
-                    >
-                      {resource.resource_summary}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+            {/* weekly plan cards */}
+            <div className="flex flex-col gap-4">
+              {path.weekly_plans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={cn(
+                    "rounded-2xl border p-6",
+                    "border-foreground/10 bg-white/70 backdrop-blur-md",
+                    "dark:border-white/10 dark:bg-white/[0.03]"
+                  )}
+                >
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                    Week {plan.week_number}
+                  </h2>
+                  <p className="mt-2 text-sm text-gray-700 dark:text-slate-300">
+                    {plan.plan_description}
+                  </p>
+
+                  {/* goals */}
+                  <div className="mt-5">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-slate-400">
+                      Goals
+                    </h3>
+                    <ul className="mt-2 list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-slate-300">
+                      {plan.goal.map((g, idx) => (
+                        <li key={idx}>{g}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* resources */}
+                  <div className="mt-5">
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-slate-400">
+                      Resources
+                    </h3>
+                    <ul className="mt-2 space-y-2">
+                      {plan.resources.map((resource) => (
+                        <li key={resource.id} className="flex items-start gap-2">
+                          <span className="mt-0.5 text-gray-500 dark:text-slate-400">
+                            <ResourceIcon type={resource.resource_type} />
+                          </span>
+                          <a
+                            href={resource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-medium text-primary underline-offset-2 hover:underline dark:text-yellow-300"
+                          >
+                            {resource.resource_summary}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        ))}
+          </>
+        )}
       </div>
-    </div>
+    </>
   )
 }
