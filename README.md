@@ -27,7 +27,9 @@ A FastAPI backend API for generating personalized learning schedules. Users can 
 
 ## Prerequisites
 
-* **Docker** (Docker Desktop recommended)
+- **Docker** (Docker Desktop recommended)
+- **Bun** (required for local frontend development and Playwright tests)
+- **uv** (required only for running the backend locally without Docker)
 
 > This project uses **Docker Compose v2** (`docker compose`).
 > Modern Docker installations already include this.
@@ -37,9 +39,10 @@ A FastAPI backend API for generating personalized learning schedules. Users can 
 ```bash
 docker --version
 docker compose version
+bun --version
+uv --version
 ```
-
-If both commands work, you're ready to go.
+If you only run the app with Docker, Bun and uv are not required.
 
 ---
 
