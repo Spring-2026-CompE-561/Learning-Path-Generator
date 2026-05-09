@@ -1,6 +1,7 @@
 from app.core.auth import get_password_hash
 from app.repository.user import UserRepository
 from sqlalchemy.orm import Session
+from app.utils.email import normalize_email
 
 from app.schemas.user import UserDB, UserCreate, UserResponse, UserUpdate
 from fastapi import HTTPException, status
@@ -101,7 +102,10 @@ class UserService:
             HTTPException: If the username or email is already exists.
         """
 
-        if self.is_email_taken(db, user_db.email):
+        # making sure to normalize email so emails with stuff like . and + would count as same for google, stops waht professor was talking about 
+        normalized_email = normalize_email(user_db.email)
+
+        if self.is_email_taken(db, normalized_email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered",
@@ -116,7 +120,7 @@ class UserService:
         hashed_password = get_password_hash(user_db.password)
         user_db = UserDB(
             username=user_db.username,
-            email=user_db.email,
+            email=normalized_email,
             hashed_password=hashed_password,
         )
         return self.repository.create_user(db, user_db)
@@ -133,7 +137,8 @@ class UserService:
         Returns:
             UserResponse | None: The authenticated user if credentials are valid, None otherwise.
         """
-        user = self.repository.get_by_mail(db, email)
+        normalized_email = normalize_email(email)
+        user = self.repository.get_by_mail(db, normalized_email)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -154,7 +159,7 @@ class UserService:
         if user_db.username:
             db_user.username = user_db.username
         if user_db.email:
-            db_user.email = user_db.email
+            db_user.email = normalize_email(user_db.email)
         if user_db.password:
             db_user.hashed_password = get_password_hash(user_db.password)
         return self.repository.update_user(db, db_user)
