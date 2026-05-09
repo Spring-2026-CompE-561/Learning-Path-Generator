@@ -110,19 +110,25 @@ The frontend communicates with the backend automatically via the configured envi
 
 ## Services Overview
 
-The root-level `docker-compose.yml` runs the full application stack:
+The application runs using Docker Compose with three services:
 
-* **db** - PostgreSQL 16 database using a named Docker volume (`pgdata`)
-* **backend** - FastAPI backend built from `backend/Dockerfile`
-* **frontend** - Next.js frontend built from `frontend/Dockerfile`
+- **db** – PostgreSQL database
+- **backend** – FastAPI server
+- **frontend** – Next.js application
+
+### How it works
+
+- The database starts first
+- The backend connects to the database
+- The frontend communicates with the backend API
 
 ### Docker Compose Behavior
 
 * PostgreSQL runs first and uses a healthcheck with `pg_isready`
 * Backend waits for the database to become healthy before starting
 * Frontend waits for the backend service
-* Backend source is bind-mounted for hot reload
-* Frontend source is bind-mounted for hot reload
+* Backend is configured for development with hot reload
+* Frontend is built into a production-ready container
 * Anonymous volumes protect container-specific `.venv`, `node_modules`, and `.next` folders
 
 ### Environment Variables Used by Compose
@@ -416,7 +422,7 @@ bunx playwright test --headed --debug
 
 ---
 
-#### Notes
+#### Testing Notes
 
 * Tests require both **frontend and backend** to be running
 * Default test URL: `http://localhost:3000`
