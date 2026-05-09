@@ -22,7 +22,7 @@ RUN rm -rf node_modules \
     && bun install --frozen-lockfile --production
 
 
-#Stage 2L minimal runtime
+#Stage 2 minimal runtime
 # start a second smaller image, smaller than the build image
 FROM oven/bun:1-slim
 WORKDIR /app
