@@ -22,3 +22,31 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
+
+# Git
+.git
+.gitignore
+
+# Docker-related
+Dockerfile
+docker-compose.yml
+
+# Logs
+*.log
+
+# Coverage /reports
+.coverage
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+
+# Python packaging leftovers
+*.egg-info/
+
+# Misc caches
+.cache/
+
+# OS junk
+Thumbs.db

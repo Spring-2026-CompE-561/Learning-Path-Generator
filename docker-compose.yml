@@ -75,12 +75,6 @@ services:
       INTERNAL_API_URL: http://backend:8000
     ports:
       - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      # Same anonymous-volume trick: keep container's node_modules and
-      # .next build cache instead of inheriting from the host.
-      - /app/node_modules
-      - /app/.next
 
 # Named volume — Docker manages where this lives on disk. Survives
 # container restarts and `docker compose down`. Wipe with `down -v`.
