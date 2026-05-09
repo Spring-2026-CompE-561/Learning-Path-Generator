@@ -15,7 +15,12 @@ RUN bun install --frozen-lockfile
 COPY . .
 
 # building Next.js for production
-Run bun run build
+RUN bun run build
+
+# Remove dev dependencies after build
+RUN rm -rf node_modules \ 
+    && bun install --frozen-lockfile --production
+
 
 #Stage 2L minimal runtime
 # start a second smaller image, smaller than the build image
