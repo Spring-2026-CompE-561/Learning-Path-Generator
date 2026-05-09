@@ -17,26 +17,20 @@ COPY . .
 # building Next.js for production
 RUN bun run build
 
-# Remove dev dependencies after build
-RUN rm -rf node_modules \ 
-    && bun install --frozen-lockfile --production
-
 
 #Stage 2 minimal runtime
 # start a second smaller image, smaller than the build image
-FROM oven/bun:1-slim
+FROM node:20-alpine
 WORKDIR /app
 # Declare this is a production environment
 ENV NODE_ENV=production
 # Copying all neccessaries from builder
-COPY --from=builder /app/.next .next
-COPY --from=builder /app/public public
-COPY --from=builder /app/package.json package.json
-COPY --from=builder /app/bun.lock bun.lock
-COPY --from=builder /app/node_modules node_modules
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
 
 
 EXPOSE 3000
 # command run when container started
-CMD ["bun","run", "start"]
+CMD ["node", "./server.js"]
