@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 
 from app.repository.learning_path import LearningPathRepository
@@ -87,8 +88,15 @@ class LearningPathService:
             )
         
         # create learning path so an ID is given
-        learning_path = self.repository.create_learning_path(db, learning_path_data, user_id)
-
+        # already created? means error 
+        try:
+            learning_path = self.repository.create_learning_path(db, learning_path_data, user_id)
+        except IntegrityError:
+            db.rollback()
+            raise HTTPException(
+                status_code =status.HTTP_409_CONFLICT,
+                detail=f"You already have a learning path on '{learning_path_data.topic}'. Try a different topic.",
+            )
         # generates the plan u want with resources now
         new_plan = generatingWeeklyPlans(topic = learning_path.topic, proficency = learning_path.proficency, weeks = learning_path.weeks, learning_path_id= learning_path.id)
 
