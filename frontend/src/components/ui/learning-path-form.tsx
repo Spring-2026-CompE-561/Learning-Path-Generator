@@ -41,7 +41,7 @@ const formSchema = z.object({
   weeks: z.number()
     .int()
     .min(1, "Must be at least 1 week")
-    .max(52, "Must be at most 52 weeks"),
+    .max(52, "Must be at most 6 weeks"),
 })
 
 // closes dialog after successful
@@ -181,7 +181,7 @@ export function LearningPathForm({ className, onCreateSuccess, ...props }: Learn
                       id="weeks"
                       type="number"
                       min={1}
-                      max={52}
+                      max={6}
                       aria-invalid={fieldState.invalid}
                     />
                     {fieldState.invalid && (

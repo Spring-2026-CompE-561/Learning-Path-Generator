@@ -21,7 +21,7 @@ class LearningPathBase(BaseModel):
     ] = None
 
     # sets min amd max to >= 1 and <= 52 while ... makes it required
-    weeks: int = Field(..., ge=1, le=52)
+    weeks: int = Field(..., ge=1, le=6)
 
 
 class LearningPathCreate(LearningPathBase):
