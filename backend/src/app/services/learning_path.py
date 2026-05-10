@@ -6,6 +6,8 @@ from app.schemas.learningpath import LearningPathCreate
 from app.models.learningpath import LearningPath
 
 
+
+
 class LearningPathService:
     """Service class for learning-path-related operations."""
 
@@ -59,18 +61,37 @@ class LearningPathService:
             HTTPException: If creation fails.
         """
 
+        from app.repository.weekly_plan import WeeklyPlanRepository
+        from app.repository.resource import ResourceRepository
+        from app.services.ai import generatingWeeklyPlans, moderateTopic
+
+        moderation = moderateTopic(learning_path_data.topic, learning_path_data.weeks)
+
+        # make sure that the topic is appropriate
+        if not moderation["appropriate"]:
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail=moderation["reason"] or "This topic is not allowed"
+            )
+        
+        # make sure if its too broad, so cant do  that and maybe give suggestions?
+        if not moderation["specific_enough"]:
+            # gives suggestions
+            suggestion = moderation.get("suggestion", "")
+            message = moderation["reason"] or "Topic is too broad."
+            if suggestion:
+                message = f"{message} {suggestion}"
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=message
+            )
+        
         # create learning path so an ID is given
         learning_path = self.repository.create_learning_path(db, learning_path_data, user_id)
-
-        
-        from app.services.ai import generatingWeeklyPlans
-        from app.repository.weekly_plan import WeeklyPlanRepository
 
         # generates the plan u want with resources now
         new_plan = generatingWeeklyPlans(topic = learning_path.topic, proficency = learning_path.proficency, weeks = learning_path.weeks, learning_path_id= learning_path.id)
 
-
-        from app.repository.resource import ResourceRepository
 
         # saving weekly plan + resources associated with it into the db
         weekly_plan_repo = WeeklyPlanRepository()

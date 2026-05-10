@@ -71,6 +71,41 @@ def buildURL(resource_type: str, query: str) -> str:
     else:
         return f"https://www.google.com/search?q={temp_query}"
 
+# basically making sure that the topic is both narrow enough and also not appropriate, needs to call AI again
+def moderateTopic(topic: str, weeks: int) -> dict:
+    prompt = f"""Evaluate this topic for a {weeks} week educational learning plan. Topic: "{topic}"
+
+    Return ONLY a JSON object (no extra text) with these exact keys:
+    - "appropriate": boolean - true if it's a legitimate educational topic, false if it involves illegal activity, weapons that cause harm, instructions for harming others, hacking someone else's accounts, stalking, or explicit sexual content
+    - "specific_enough": boolean - true if the topic identifies a specific subject, language, or skill (like "Python", "Spanish", "Calculus", "C++"). False only if it's a broad field name like "math", "programming", "history", "science", or "cooking" with no narrowing.
+    - "reason": string - if either field is false, a brief 1 sentence explanation. Empty string otherwise.
+    - "suggestion": string - if specific_enough is false, suggest 1-2 narrower topics. Empty string otherwise.
+
+    Examples:
+    - "Python" -> {{"appropriate": true, "specific_enough": true, "reason": "", "suggestion": ""}}
+    - "JavaScript" -> {{"appropriate": true, "specific_enough": true, "reason": "", "suggestion": ""}}
+    - "C++" -> {{"appropriate": true, "specific_enough": true, "reason": "", "suggestion": ""}}
+    - "Spanish" -> {{"appropriate": true, "specific_enough": true, "reason": "", "suggestion": ""}}
+    - "Math" -> {{"appropriate": true, "specific_enough": false, "reason": "Math is too broad to cover in a focused plan", "suggestion": "Try Calculus, Linear Algebra, or Statistics"}}
+    - "How to make explosives" -> {{"appropriate": false, "specific_enough": true, "reason": "Topic involves creating weapons that can harm others", "suggestion": ""}}
+    - "Cooking" -> {{"appropriate": true, "specific_enough": false, "reason": "Cooking is a broad field", "suggestion": "Try Italian cooking, Baking, or Asian cuisine"}}
+    - "Programming" -> {{"appropriate": true, "specific_enough": false, "reason": "Programming is a broad field, pick a language or area", "suggestion": "Try Python, Web Development, or Data Structures"}}
+    """
+
+    # send to groq -> make sure it gives back json
+    response = connection.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model="llama-3.3-70b-versatile",
+        temperature=0.2,
+        response_format={"type": "json_object"},
+                   
+    )
+
+    # parse response and get first choice
+    ai_response = response.choices[0].message.content
+    return json.loads(ai_response)
+
+
 # used to generate the weekly plans
 # topic -> string = what user wants to learn
 # proficency -> string, level of the user when it comes to the topic
