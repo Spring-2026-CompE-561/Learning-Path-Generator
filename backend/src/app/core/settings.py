@@ -50,5 +50,3 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
-print("ENV FILE:", ENV_FILE)
-print("ENV EXISTS:", ENV_FILE.exists())
